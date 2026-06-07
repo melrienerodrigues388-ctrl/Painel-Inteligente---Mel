@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Convites Studio 🎀</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#faf5ff;--card:#fff;--border:#e9d5ff;--text:#1e1b4b;
+  --muted:#6b7280;--accent:#9333ea;--accent2:#db2777;--surface:#f3e8ff;
+}
+body.dark{
+  --bg:#0f0f13;--card:#1a1a24;--border:#2a2a3a;--text:#f0f0ff;
+  --muted:#888aaa;--accent:#c084fc;--accent2:#f472b6;--surface:#22222f;
+}
+body{background:var(--bg);color:var(--text);font-family:'Nunito','Segoe UI',sans-serif;min-height:100vh;transition:background 0.3s,color 0.3s;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:var(--accent);opacity:0.4;border-radius:3px;}
+.btn{cursor:pointer;border:none;border-radius:10px;padding:8px 16px;font-family:inherit;font-weight:700;font-size:13px;transition:all 0.2s;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 15px #9333ea44;}
+.btn-primary:disabled{opacity:0.5;transform:none;cursor:not-allowed;}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:8px;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface);color:var(--text);}
+.btn-danger{background:transparent;color:#ef4444;border:1px solid #ef444444;}
+.btn-danger:hover{background:#ef444411;}
+input,textarea,select{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);padding:9px 13px;font-family:inherit;font-size:14px;width:100%;outline:none;transition:border-color 0.2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:70px;}
+label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+/* HEADER */
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;gap:12;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px #9333ea12;}
+.logo-title{font-family:'Playfair Display',serif;font-weight:900;font-size:17px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.verse-box{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:12px;padding:6px 14px;flex:1;max-width:420px;border:1px solid var(--border);}
+.verse-text{font-style:italic;font-size:11px;color:var(--text);line-height:1.4;}
+.verse-ref{color:var(--accent);font-weight:700;font-size:11px;white-space:nowrap;}
+/* TABS */
+.tabs{background:var(--card);border-bottom:1px solid var(--border);padding:0 14px;display:flex;gap:2px;overflow-x:auto;}
+.tab{cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:inherit;font-weight:700;font-size:12px;padding:10px 12px;border-bottom:3px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:8px 8px 0 0;}
+/* CONTENT */
+.content{padding:18px;max-width:1200px;margin:0 auto;}
+.content.kanban-mode{max-width:100%;}
+.fade-in{animation:fi 0.3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* CARDS */
+.card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px;}
+.ch{transition:all 0.2s;}
+.ch:hover{transform:translateY(-2px);box-shadow:0 8px 25px #9333ea22;}
+/* GRID */
+.grid-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px;margin-bottom:20px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
+.grid-ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+/* STAT CARD */
+.stat-card{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);border-left-width:4px;transition:all 0.2s;}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-emoji{font-size:22px;margin-bottom:4px;}
+.stat-value{font-size:26px;font-weight:900;}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;}
+/* KANBAN */
+.kanban-wrap{display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:12px;}
+.kanban-col{min-width:260px;max-width:260px;background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;flex-shrink:0;transition:all 0.2s;}
+.kanban-col.drag-over{border:2px dashed var(--accent);background:var(--surface);}
+.col-header{padding:11px 13px;display:flex;align-items:center;gap:7px;}
+.col-body{padding:9px;display:flex;flex-direction:column;gap:7px;min-height:80px;}
+.k-card{background:var(--surface);border-radius:10px;padding:11px;border:1px solid var(--border);border-left-width:4px;cursor:grab;transition:all 0.15s;}
+.k-card:hover{box-shadow:0 4px 12px #9333ea22;}
+.k-card.dragging{opacity:0.5;}
+/* TAG */
+.tag{display:inline-block;border-radius:7px;padding:1px 7px;font-size:11px;font-weight:700;margin:1px;}
+/* BADGE */
+.badge{border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;}
+/* INSIGHT */
+.insight{font-size:12px;padding:9px 11px;border-radius:9px;border-left-width:3px;border-left-style:solid;line-height:1.6;margin-top:8px;}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#0008;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal-box{background:var(--card);border-radius:18px;padding:26px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px #0007;border:1px solid var(--border);}
+/* MINI STATS */
+.mini-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;}
+.mini-stat{background:var(--surface);border-radius:9px;padding:9px 5px;text-align:center;}
+.mini-stat-val{font-size:21px;font-weight:900;}
+.mini-stat-lbl{font-size:10px;color:var(--muted);font-weight:700;}
+/* CHAT */
+.chat-box{border-radius:14px;border:1px solid var(--border);height:360px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--card);}
+.chat-msg{max-width:80%;padding:9px 13px;border-radius:13px;font-size:14px;line-height:1.7;white-space:pre-wrap;}
+.chat-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.chat-msg.ai{align-self:flex-start;background:var(--surface);color:var(--text);}
+/* ANALISE MES */
+.analise-mes{background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--border);margin-top:20px;}
+.analise-item{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:10px;margin-bottom:10px;border-left:4px solid var(--accent);}
+/* SECTION TITLE */
+.sec-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;margin-bottom:6px;}
+.sec-desc{color:var(--muted);font-size:13px;margin-bottom:16px;}
+/* SEPARATOR */
+.sep{border:none;border-top:1px solid var(--border);margin:14px 0;}
+/* FLEXROW */
+.row{display:flex;align-items:center;gap:8px;}
+.row.wrap{flex-wrap:wrap;}
+/* HIDDEN */
+.hidden{display:none!important;}
+/* HISTORY ITEM */
+.hist-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:center;}
+/* ORCAMENTO ITEM */
+.orc-item{background:var(--card);border-radius:12px;padding:13px 15px;border:1px solid var(--border);border-left-width:4px;margin-bottom:9px;}
+/* QUICK NOTE ITEM */
+.note-item{background:var(--card);border-radius:11px;padding:12px 15px;border:1px solid var(--border);border-left:4px solid var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+/* RESPONSIVE */
+@media(max-width:700px){
+  .grid-2{grid-template-columns:1fr;}
+  .verse-box{display:none;}
+  .header{gap:8px;}
+  .modal-box{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header" id="header">
+  <span style="font-size:26px">🎀</span>
+  <div>
+    <div class="logo-title">Convites Studio</div>
+    <div style="font-size:10px;color:var(--muted)">Gestão Inteligente</div>
+  </div>
+  <div style="flex:1"></div>
+  <div class="verse-box" id="verseBox">
+    <span style="font-size:15px">✝️</span>
+    <div>
+      <span class="verse-text" id="verseText"></span>
+      <span class="verse-ref" id="verseRef"></span>
+    </div>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="toggleDark()" id="darkBtn">🌙</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs" id="tabs">
+  <button class="tab active" data-tab="dashboard">🏠 Início</button>
+  <button class="tab" data-tab="kanban">📋 Tarefas</button>
+  <button class="tab" data-tab="capture">⚡ Captura</button>
+  <button class="tab" data-tab="ideas">💡 Ideias</button>
+  <button class="tab" data-tab="convites">🎨 Convites do Dia</button>
+  <button class="tab" data-tab="orcamentos">💬 Orçamentos</button>
+  <button class="tab" data-tab="library">📚 Biblioteca</button>
+  <button class="tab" data-tab="ai">🤖 Consultora</button>
+</div>
+
+<!-- PAGES -->
+<div id="page-dashboard" class="content fade-in"></div>
+<div id="page-kanban" class="content kanban-mode fade-in hidden"></div>
+<div id="page-capture" class="content fade-in hidden"></div>
+<div id="page-ideas" class="content fade-in hidden"></div>
+<div id="page-convites" class="content fade-in hidden"></div>
+<div id="page-orcamentos" class="content fade-in hidden"></div>
+<div id="page-library" class="content fade-in hidden"></div>
+<div id="page-ai" class="content fade-in hidden"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const VERSES = [
+  {text:"Porque sou eu que conheço os planos que tenho para vocês, diz o Senhor, planos de fazê-los prosperar.",ref:"Jeremias 29:11"},
+  {text:"Tudo posso naquele que me fortalece.",ref:"Filipenses 4:13"},
+  {text:"O Senhor é o meu pastor e nada me faltará.",ref:"Salmos 23:1"},
+  {text:"Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.",ref:"Salmos 37:5"},
+  {text:"Seja forte e corajoso. Não se apavore, pois o Senhor seu Deus estará com você.",ref:"Josué 1:9"},
+  {text:"Deleita-te no Senhor, e ele satisfará os desejos do teu coração.",ref:"Salmos 37:4"},
+  {text:"O amor é paciente, o amor é bondoso.",ref:"1 Coríntios 13:4"},
+  {text:"Porque Deus não nos deu espírito de covardia, mas de poder, de amor e de equilíbrio.",ref:"2 Timóteo 1:7"},
+  {text:"Busca primeiro o Reino de Deus e a sua justiça, e todas estas coisas serão acrescentadas a você.",ref:"Mateus 6:33"},
+  {text:"Com Deus tudo é possível.",ref:"Mateus 19:26"},
+  {text:"O Senhor te abençoe e te guarde.",ref:"Números 6:24"},
+  {text:"Alegrai-vos sempre no Senhor; outra vez digo, alegrai-vos.",ref:"Filipenses 4:4"},
+  {text:"A fé é a certeza daquilo que esperamos e a prova das coisas que não vemos.",ref:"Hebreus 11:1"},
+  {text:"Não te deixes vencer pelo mal, mas vence o mal com o bem.",ref:"Romanos 12:21"},
+  {text:"O Senhor está perto de todos que o invocam.",ref:"Salmos 145:18"},
+  {text:"Confia no Senhor de todo o teu coração e não te apoies no teu próprio entendimento.",ref:"Provérbios 3:5"},
+  {text:"Ele cura os de coração partido e cuida das suas feridas.",ref:"Salmos 147:3"},
+  {text:"Aquele que começou boa obra em você a completará.",ref:"Filipenses 1:6"},
+  {text:"Sou o caminho, a verdade e a vida.",ref:"João 14:6"},
+  {text:"Amarás o Senhor teu Deus de todo o teu coração.",ref:"Mateus 22:37"},
+  {text:"Grandes coisas fez o Senhor por nós, e por isso estamos alegres.",ref:"Salmos 126:3"},
+  {text:"Vinde a mim todos os que estão cansados e eu vos aliviarei.",ref:"Mateus 11:28"},
+  {text:"O Senhor é a minha luz e a minha salvação; a quem temerei?",ref:"Salmos 27:1"},
+  {text:"Deus é refúgio e fortaleza, auxílio sempre presente nas tribulações.",ref:"Salmos 46:1"},
+  {text:"Não andem ansiosos por coisa alguma, mas em tudo, pela oração, apresentem seus pedidos a Deus.",ref:"Filipenses 4:6"},
+  {text:"A graça do Senhor Jesus Cristo seja com o vosso espírito.",ref:"Filipenses 4:23"},
+  {text:"Eu sou a videira, vós sois os ramos.",ref:"João 15:5"},
+  {text:"Deus é amor, e quem permanece no amor permanece em Deus.",ref:"1 João 4:16"},
+  {text:"Não temas, porque eu sou contigo.",ref:"Isaías 41:10"},
+  {text:"Ele dá força ao cansado e vigor ao que não tem forças.",ref:"Isaías 40:29"},
+  {text:"O Senhor te guardará de todo o mal; ele guardará a tua alma.",ref:"Salmos 121:7"},
+];
+
+const uid=()=>Math.random().toString(36).slice(2,10);
+const nowISO=()=>new Date().toISOString();
+const fmtDate=iso=>iso?new Date(iso).toLocaleDateString('pt-BR'):'—';
+const diffDays=(a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
+
+let S = {
+  columns:[
+    {id:"urgente",   title:"🔥 Urgente",             color:"#ef4444"},
+    {id:"hoje",      title:"📅 Fazer Hoje",           color:"#f97316"},
+    {id:"andamento", title:"⚙️ Em Andamento",         color:"#3b82f6"},
+    {id:"ideias_col",title:"💡 Ideias",               color:"#eab308"},
+    {id:"criar",     title:"🎨 Convites para Criar",  color:"#ec4899"},
+    {id:"melhorias", title:"📈 Melhorias do Negócio", color:"#14b8a6"},
+    {id:"concluido", title:"✅ Concluído",            color:"#22c55e"},
+  ],
+  cards:[],
+  quickNotes:[],
+  ideas:[],
+  convitesDodia:[],
+  orcamentos:[],
+  themes:[],
+  dark:false,
+  tab:"dashboard"
+};
+
+let dragCardId=null, dragColId=null;
+let editingCard=null, editingIdea=null, editingTheme=null;
+let aiCache={};
+
+// ─── AI ───────────────────────────────────────────────────────
+async function callAI(prompt){
+  const r=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+  });
+  const d=await r.json();
+  return d.content?.map(b=>b.text||"").join("")||"Sem análise.";
+}
+
+// ─── VERSE ────────────────────────────────────────────────────
+function setVerse(){
+  const v=VERSES[new Date().getDate()%VERSES.length];
+  document.getElementById("verseText").textContent=`"${v.text}" `;
+  document.getElementById("verseRef").textContent=v.ref;
+}
+
+// ─── DARK MODE ────────────────────────────────────────────────
+function toggleDark(){
+  S.dark=!S.dark;
+  document.body.classList.toggle("dark",S.dark);
+  document.getElementById("darkBtn").textContent=S.dark?"☀️":"🌙";
+  render();
+}
+
+// ─── TABS ─────────────────────────────────────────────────────
+function switchTab(tab){
+  S.tab=tab;
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+  document.querySelectorAll("[id^='page-']").forEach(p=>p.classList.toggle("hidden",p.id!=="page-"+tab));
+  render();
+}
+document.getElementById("tabs").addEventListener("click",e=>{
+  if(e.target.dataset.tab) switchTab(e.target.dataset.tab);
+});
+
+// ─── MODAL ────────────────────────────────────────────────────
+function openModal(html){
+  document.getElementById("modalBox").innerHTML=html;
+  document.getElementById("modalOverlay").classList.remove("hidden");
+}
+function closeModal(){
+  document.getElementById("modalOverlay").classList.add("hidden");
+  editingCard=editingIdea=editingTheme=null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+function render(){
+  const t=S.tab;
+  if(t==="dashboard") renderDashboard();
+  else if(t==="kanban") renderKanban();
+  else if(t==="capture") renderCapture();
+  else if(t==="ideas") renderIdeas();
+  else if(t==="convites") renderConvites();
+  else if(t==="orcamentos") renderOrcamentos();
+  else if(t==="library") renderLibrary();
+  else if(t==="ai") renderAI();
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────
+function pColor(p){return{Baixa:"#22c55e",Média:"#eab308",Alta:"#f97316",Urgente:"#ef4444"}[p]||"#94a3b8";}
+function getMonthProd(theme){
+  const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+  return S.convitesDodia.filter(p=>{const d=new Date(p.date);return d.getMonth()===m&&d.getFullYear()===y&&p.theme.toLowerCase()===theme.toLowerCase();}).reduce((a,p)=>a+Number(p.qty),0);
+}
+function getTotalProd(theme){
+  return S.convitesDodia.filter(p=>p.theme.toLowerCase()===theme.toLowerCase()).reduce((a,p)=>a+Number(p.qty),0);
+}
+function getOrcCount(theme){
+  const o=S.orcamentos.find(x=>x.theme.toLowerCase()===theme.toLowerCase());
+  return o?o.count:0;
+}
+
+// ─── ANALISE MES (a nova análise inteligente) ─────────────────
+function buildAnaliseMes(){
+  if(S.themes.length===0) return `<p style="color:var(--muted);font-size:13px">Cadastre temas na Biblioteca para ver a análise mensal.</p>`;
+  const now=new Date(),mes=now.toLocaleString('pt-BR',{month:'long',year:'numeric'});
+  let html=`<p style="font-size:13px;color:var(--muted);margin-bottom:14px">Análise de <strong>${mes}</strong> — cruzando orçamentos, convites produzidos e modelos disponíveis:</p>`;
+  let temAnálise=false;
+  S.themes.forEach(t=>{
+    const models=Number(t.models||0);
+    const orc=getOrcCount(t.name);
+    const prodMes=getMonthProd(t.name);
+    const prodTotal=getTotalProd(t.name);
+    if(orc===0&&prodMes===0) return;
+    temAnálise=true;
+    // calcular meta de modelos
+    // lógica: se orc>=1 ou prodMes>=1, calcular necessidade
+    let metaModelos=models;
+    let precisa=0;
+    if(orc>0||prodMes>0){
+      // meta = max(orc,prodMes) * 3 — base mínima de variedade
+      const demanda=Math.max(orc,prodMes);
+      metaModelos=Math.max(demanda*3,15); // pelo menos 15 modelos ou 3x a demanda
+      precisa=Math.max(0,metaModelos-models);
+    }
+    let cor="#22c55e", emoji="✅";
+    if(precisa>10){cor="#ef4444";emoji="🔥";}
+    else if(precisa>0){cor="#f97316";emoji="📈";}
+    const msg=precisa>0
+      ? `Este mês vieram <strong>${orc}</strong> orçamento(s) para este tema e você produziu <strong>${prodMes}</strong> convite(s). Você me informou que tem <strong>${models}</strong> modelo(s). Com base na saída e nos orçamentos, você precisa criar mais <strong>${precisa} modelo(s)</strong> para que o cliente não precise buscar variedade em outro lugar.`
+      : `Este mês vieram <strong>${orc}</strong> orçamento(s) e você produziu <strong>${prodMes}</strong> convite(s). Com <strong>${models}</strong> modelo(s) você está bem abastecida para a demanda atual. ✅`;
+    html+=`
+      <div class="analise-item" style="background:${cor}10;border-left-color:${cor};border-left-width:4px;border-left-style:solid;border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:18px">${emoji}</span>
+          <strong style="font-size:15px;color:${cor}">${t.name}</strong>
+          <span style="margin-left:auto;background:${cor}22;color:${cor};padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;">${precisa>0?`+${precisa} necessários`:'Estoque ok'}</span>
+        </div>
+        <p style="font-size:13px;line-height:1.7;color:var(--text)">${msg}</p>
+        <div style="display:flex;gap:10px;margin-top:8px;font-size:12px;color:var(--muted)">
+          <span>📦 ${models} modelos</span>
+          <span>💬 ${orc} orçamentos</span>
+          <span>🎨 ${prodMes} produzidos/mês</span>
+          <span>📊 ${prodTotal} total</span>
+        </div>
+      </div>`;
+  });
+  if(!temAnálise) html+=`<p style="color:var(--muted);font-size:13px">Registre convites produzidos e orçamentos para ver a análise aparecer aqui.</p>`;
+  return html;
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────
+function renderDashboard(){
+  const open=S.cards.filter(c=>c.columnId!=="concluido").length;
+  const done=S.cards.filter(c=>c.columnId==="concluido").length;
+  const week=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=7).reduce((a,p)=>a+Number(p.qty),0);
+  const month=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=30).reduce((a,p)=>a+Number(p.qty),0);
+  const byTheme={};
+  S.convitesDodia.forEach(p=>{byTheme[p.theme]=(byTheme[p.theme]||0)+Number(p.qty);});
+  const topProd=Object.entries(byTheme).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topOrc=[...S.orcamentos].sort((a,b)=>b.count-a.count).slice(0,5);
+  const stats=[
+    {label:"Tarefas Abertas",value:open,emoji:"📋",color:"#3b82f6"},
+    {label:"Concluídas",value:done,emoji:"✅",color:"#22c55e"},
+    {label:"Ideias",value:S.ideas.length,emoji:"💡",color:"#eab308"},
+    {label:"Orçamentos",value:S.orcamentos.length,emoji:"💬",color:"#ec4899"},
+    {label:"Semana",value:week,emoji:"⚡",color:"#f97316"},
+    {label:"Mês",value:month,emoji:"📈",color:"#a855f7"},
+    {label:"Temas",value:S.themes.length,emoji:"🎨",color:"#14b8a6"},
+  ];
+  document.getElementById("page-dashboard").innerHTML=`
+    <h2 class="sec-title">Painel Principal ✨</h2>
+    <div class="grid-stats">
+      ${stats.map(s=>`<div class="stat-card ch" style="border-left-color:${s.color}">
+        <div class="stat-emoji">${s.emoji}</div>
+        <div class="stat-value" style="color:${s.color}">${s.value}</div>
+        <div class="stat-label">${s.label}</div>
+      </div>`).join("")}
+    </div>
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="card">
+        <h3 style="font-weight:800;margin-bottom:12px;color:var(--accent)">🏆 Mais Produzidos</h3>
+        ${topProd.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados ainda</p>':topProd.map(([t,n],i)=>`
+          <div class="row" style="margin-bottom:8px">
+            <span style="font-weight:900;color:var(--accent);width:22px">${i+1}º</span>
+            <span style="flex:1;font-weight:600">${t}</span>
+            <span class="badge" style="background:var(--surface)">${n}</span>
+          </div>`).join("")}
+      </div>
+      <div class="card">
+        <h3 style="font-weight:800;margin-bottom:12px;color:var(--accent2)">💬 Mais Orçamentos</h3>
+        ${topOrc.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados ainda</p>':topOrc.map((o,i)=>`
+          <div class="row" style="margin-bottom:8px">
+            <span style="font-weight:900;color:var(--accent2);width:22px">${i+1}º</span>
+            <span style="flex:1;font-weight:600">${o.theme}</span>
+            <span class="badge" style="background:#ec489922;color:#ec4899">${o.count}x</span>
+          </div>`).join("")}
+      </div>
+    </div>
+    <!-- ANÁLISE DO MÊS -->
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="font-weight:800;margin-bottom:14px;font-size:16px">📊 Análise do Mês — Necessidade de Modelos</h3>
+      ${buildAnaliseMes()}
+    </div>
+    <div class="card">
+      <div class="row" style="margin-bottom:12px">
+        <h3 style="font-weight:800;flex:1">🤖 Recomendações da IA</h3>
+        <button class="btn btn-primary btn-sm" onclick="runDashAI()" id="dashAIBtn">Analisar Agora</button>
+      </div>
+      <div id="dashAIResult" style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">
+        ${aiCache.dashboard||'<span style="color:var(--muted)">Clique em "Analisar Agora" para receber recomendações.</span>'}
+      </div>
+    </div>`;
+}
+async function runDashAI(){
+  const btn=document.getElementById("dashAIBtn");
+  btn.textContent="Analisando...";btn.disabled=true;
+  const byTheme={};S.convitesDodia.forEach(p=>{byTheme[p.theme]=(byTheme[p.theme]||0)+Number(p.qty);});
+  const prompt=`Você é consultora de negócios de convites digitais. Dados:
+- Tarefas abertas: ${S.cards.filter(c=>c.columnId!=="concluido").length}
+- Orçamentos: ${S.orcamentos.map(o=>`${o.theme}(${o.count}x)`).join(", ")||"nenhum"}
+- Biblioteca: ${S.themes.map(t=>`${t.name}(${t.models} modelos)`).join(", ")||"vazia"}
+- Produção por tema: ${Object.entries(byTheme).map(([t,n])=>`${t}:${n}`).join(", ")||"nenhum"}
+Gere 3 recomendações práticas numeradas de 1 a 3, curtas e em português.`;
+  try{const r=await callAI(prompt);aiCache.dashboard=r;document.getElementById("dashAIResult").textContent=r;}
+  catch{document.getElementById("dashAIResult").textContent="Erro ao conectar.";}
+  btn.textContent="Analisar Agora";btn.disabled=false;
+}
+
+// ─── KANBAN ───────────────────────────────────────────────────
+function renderKanban(){
+  document.getElementById("page-kanban").innerHTML=`
+    <div style="padding:18px">
+      <div class="row" style="margin-bottom:18px">
+        <h2 class="sec-title" style="margin-bottom:0">Quadro de Tarefas 📋</h2>
+        <button class="btn btn-primary btn-sm" style="margin-left:10px" onclick="addColumn()">+ Coluna</button>
+      </div>
+      <div class="kanban-wrap" id="kanbanWrap">
+        ${S.columns.map(col=>{
+          const cards=S.cards.filter(c=>c.columnId===col.id);
+          return `<div class="kanban-col" id="col-${col.id}" draggable="true"
+            ondragstart="colDragStart('${col.id}')"
+            ondragover="event.preventDefault();colDragOver('${col.id}')"
+            ondrop="colDrop('${col.id}')"
+            ondragleave="colDragLeave()">
+            <div class="col-header" style="border-bottom:3px solid ${col.color}">
+              <span style="flex:1;font-weight:800;font-size:13px">${col.title}</span>
+              <span class="badge" style="background:${col.color}33;color:${col.color}">${cards.length}</span>
+              <button class="btn btn-ghost btn-sm" style="padding:2px 6px" onclick="renameCol('${col.id}')">✏️</button>
+              <button class="btn btn-ghost btn-sm" style="padding:2px 6px;color:#ef4444" onclick="deleteCol('${col.id}')">🗑️</button>
+            </div>
+            <div class="col-body" id="body-${col.id}"
+              ondragover="event.preventDefault();setDragOver('${col.id}')"
+              ondrop="cardDrop('${col.id}')">
+              ${cards.map(card=>renderCard(card,col)).join("")}
+              <button class="btn btn-ghost btn-sm" style="width:100%;border-style:dashed" onclick="openCardModal(null,'${col.id}')">+ Cartão</button>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+}
+function renderCard(card,col){
+  const pc=pColor(card.priority);
+  const tags=card.tags?card.tags.split(",").map(t=>`<span class="tag" style="background:var(--border)">${t.trim()}</span>`).join(""):"";
+  const completed=col.id==="concluido"&&card.completedAt?`<div style="font-size:11px;color:#22c55e;margin-top:5px">✅ ${fmtDate(card.completedAt)} · ${diffDays(card.createdAt,card.completedAt)} dias</div>`:"";
+  const completeBtn=col.id!=="concluido"?`<button class="btn btn-primary btn-sm" style="flex:1" onclick="completeCard('${card.id}')">✅ Concluir</button>`:"";
+  return `<div class="k-card" id="kcard-${card.id}" draggable="true"
+    style="border-left-color:${pc}"
+    ondragstart="cardDragStart('${card.id}')">
+    <div style="font-weight:700;font-size:13px;margin-bottom:3px">${card.title}</div>
+    ${card.description?`<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${card.description}</div>`:""}
+    <div style="margin-bottom:6px">
+      ${card.priority?`<span class="tag" style="background:${pc}22;color:${pc}">${card.priority}</span>`:""}
+      ${tags}
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:7px">📅 ${fmtDate(card.createdAt)}</div>
+    <div class="row">
+      ${completeBtn}
+      <button class="btn btn-ghost btn-sm" onclick="openCardModal('${card.id}')">✏️</button>
+      <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteCard('${card.id}')">🗑️</button>
+    </div>
+    ${completed}
+  </div>`;
+}
+// kanban drag
+function cardDragStart(id){dragCardId=id;}
+function colDragStart(id){dragColId=id;}
+function colDragOver(id){document.getElementById("col-"+id)?.classList.add("drag-over");}
+function colDragLeave(){document.querySelectorAll(".kanban-col").forEach(c=>c.classList.remove("drag-over"));}
+function setDragOver(){}
+function cardDrop(colId){
+  if(!dragCardId)return;
+  S.cards=S.cards.map(c=>c.id===dragCardId?{...c,columnId:colId}:c);
+  dragCardId=null;colDragLeave();renderKanban();
+}
+function colDrop(colId){
+  if(dragCardId){cardDrop(colId);return;}
+  if(!dragColId||dragColId===colId){dragColId=null;colDragLeave();return;}
+  const cols=[...S.columns];
+  const from=cols.findIndex(c=>c.id===dragColId);
+  const to=cols.findIndex(c=>c.id===colId);
+  const[moved]=cols.splice(from,1);cols.splice(to,0,moved);
+  S.columns=cols;dragColId=null;colDragLeave();renderKanban();
+}
+function addColumn(){
+  const t=prompt("Nome da nova coluna:");
+  if(t){S.columns.push({id:uid(),title:t,color:"#6366f1"});renderKanban();}
+}
+function renameCol(id){
+  const col=S.columns.find(c=>c.id===id);
+  const t=prompt("Novo nome:",col?.title);
+  if(t){S.columns=S.columns.map(c=>c.id===id?{...c,title:t}:c);renderKanban();}
+}
+function deleteCol(id){
+  if(confirm("Excluir coluna?"))S.columns=S.columns.filter(c=>c.id!==id);renderKanban();
+}
+function completeCard(id){
+  S.cards=S.cards.map(c=>c.id===id?{...c,columnId:"concluido",completedAt:nowISO()}:c);
+  renderKanban();
+}
+function deleteCard(id){S.cards=S.cards.filter(c=>c.id!==id);render();}
+
+// ─── CARD MODAL ───────────────────────────────────────────────
+function openCardModal(id,defaultCol){
+  const card=id?S.cards.find(c=>c.id===id):{columnId:defaultCol||"hoje",title:"",description:"",priority:"Média",tags:"",observations:""};
+  editingCard=id;
+  const colOpts=S.columns.filter(c=>c.id!=="concluido").map(c=>`<option value="${c.id}"${card.columnId===c.id?" selected":""}>${c.title}</option>`).join("");
+  openModal(`
+    <h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?"Editar Cartão":"Novo Cartão"}</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label>Título *</label><input id="mTitle" value="${esc(card.title)}" placeholder="Título"/></div>
+      <div><label>Descrição</label><textarea id="mDesc">${esc(card.description||"")}</textarea></div>
+      <div><label>Coluna</label><select id="mCol">${colOpts}</select></div>
+      <div><label>Prioridade</label><select id="mPri">
+        ${["Baixa","Média","Alta","Urgente"].map(p=>`<option${card.priority===p?" selected":""}>${p}</option>`).join("")}
+      </select></div>
+      <div><label>Tags (vírgula)</label><input id="mTags" value="${esc(card.tags||"")}" placeholder="ex: safari, urgente"/></div>
+      <div><label>Observações</label><textarea id="mObs">${esc(card.observations||"")}</textarea></div>
+      <div class="row" style="margin-top:4px">
+        <button class="btn btn-primary" style="flex:1" onclick="saveCard()">💾 Salvar</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>`);
+}
+function saveCard(){
+  const title=document.getElementById("mTitle").value.trim();
+  if(!title)return;
+  const d={id:editingCard,title,description:document.getElementById("mDesc").value,columnId:document.getElementById("mCol").value,priority:document.getElementById("mPri").value,tags:document.getElementById("mTags").value,observations:document.getElementById("mObs").value};
+  if(editingCard){S.cards=S.cards.map(c=>c.id===editingCard?{...c,...d}:c);}
+  else{S.cards.push({...d,id:uid(),createdAt:nowISO(),completedAt:null});}
+  closeModal();render();
+}
+
+// ─── CAPTURE ──────────────────────────────────────────────────
+function renderCapture(){
+  document.getElementById("page-capture").innerHTML=`
+    <h2 class="sec-title">⚡ Captura Rápida</h2>
+    <p class="sec-desc">Registre qualquer ideia agora, organize depois.</p>
+    <div class="row" style="margin-bottom:14px">
+      <input id="noteInput" placeholder="💭 Digite qualquer ideia ou tarefa e pressione Enter..." style="flex:1" onkeydown="if(event.key==='Enter')addNote()"/>
+      <button class="btn btn-primary" style="margin-left:8px" onclick="addNote()">Capturar ⚡</button>
+    </div>
+    ${S.quickNotes.length===0?'<p style="color:var(--muted)">Nenhuma anotação ainda.</p>':S.quickNotes.map(n=>`
+      <div class="note-item">
+        <div style="flex:1">
+          <div style="font-weight:600">${esc(n.text)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${fmtDate(n.createdAt)}</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="noteToCard('${n.id}')">→ Tarefa</button>
+        <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteNote('${n.id}')">🗑️</button>
+      </div>`).join("")}`;
+}
+function addNote(){
+  const i=document.getElementById("noteInput");
+  if(!i.value.trim())return;
+  S.quickNotes.unshift({id:uid(),text:i.value.trim(),createdAt:nowISO()});
+  i.value="";renderCapture();
+}
+function noteToCard(id){
+  const n=S.quickNotes.find(x=>x.id===id);
+  S.quickNotes=S.quickNotes.filter(x=>x.id!==id);
+  editingCard=null;
+  openCardModal(null,"hoje");
+  setTimeout(()=>{if(document.getElementById("mTitle"))document.getElementById("mTitle").value=n.text;},50);
+}
+function deleteNote(id){S.quickNotes=S.quickNotes.filter(x=>x.id!==id);renderCapture();}
+
+// ─── IDEAS ────────────────────────────────────────────────────
+function renderIdeas(){
+  document.getElementById("page-ideas").innerHTML=`
+    <div class="row" style="margin-bottom:16px">
+      <h2 class="sec-title" style="margin-bottom:0">💡 Banco de Ideias</h2>
+      <button class="btn btn-primary" style="margin-left:10px" onclick="openIdeaModal(null)">+ Nova Ideia</button>
+    </div>
+    <div class="grid-ideas">
+      ${S.ideas.length===0?'<p style="color:var(--muted)">Nenhuma ideia ainda.</p>':S.ideas.map(idea=>{
+        const ai=aiCache["idea_"+idea.id];
+        return `<div class="card ch">
+          <div class="row" style="margin-bottom:5px">
+            <div style="flex:1;font-weight:800;font-size:15px">${esc(idea.title)}</div>
+            <button class="btn btn-ghost btn-sm" onclick="openIdeaModal('${idea.id}')">✏️</button>
+            <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteIdea('${idea.id}')">🗑️</button>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:5px">🏷️ ${idea.category} · 📅 ${fmtDate(idea.createdAt)}</div>
+          <div style="font-size:13px;margin-bottom:10px">${esc(idea.description||"")}</div>
+          ${ai?`<div style="background:var(--surface);border-radius:9px;padding:11px;font-size:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:7px">
+              <div class="mini-stat"><div class="mini-stat-val">${ai.potencial_venda}/10</div><div class="mini-stat-lbl">VENDA</div></div>
+              <div class="mini-stat"><div class="mini-stat-val">${ai.facilidade}/10</div><div class="mini-stat-lbl">FACILIDADE</div></div>
+              <div class="mini-stat"><div class="mini-stat-val">${ai.nota}/10</div><div class="mini-stat-lbl">NOTA</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:9px">
+              <div class="mini-stat"><div class="mini-stat-val">${ai.risco}</div><div class="mini-stat-lbl">RISCO</div></div>
+              <div class="mini-stat"><div class="mini-stat-val">${ai.retorno}</div><div class="mini-stat-lbl">RETORNO</div></div>
+              <div class="mini-stat"><div class="mini-stat-val" style="font-size:13px">${ai.tempo_estimado}</div><div class="mini-stat-lbl">TEMPO</div></div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:7px;color:var(--muted);line-height:1.5">🤖 ${ai.analise}</div>
+          </div>`:`<button class="btn btn-primary btn-sm" style="width:100%" id="aiBtn-${idea.id}" onclick="analyzeIdea('${idea.id}')">🤖 Analisar com IA</button>`}
+        </div>`;}).join("")}
+    </div>`;
+}
+function openIdeaModal(id){
+  const idea=id?S.ideas.find(x=>x.id===id):{title:"",description:"",category:"Convite Digital"};
+  editingIdea=id;
+  openModal(`
+    <h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?"Editar Ideia":"Nova Ideia"}</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label>Título *</label><input id="iTitle" value="${esc(idea.title)}" placeholder="Nome da ideia"/></div>
+      <div><label>Descrição</label><textarea id="iDesc">${esc(idea.description||"")}</textarea></div>
+      <div><label>Categoria</label><select id="iCat">
+        ${["Convite Digital","Tema Novo","Divulgação","Produto","Melhoria","Parceria","Outro"].map(c=>`<option${idea.category===c?" selected":""}>${c}</option>`).join("")}
+      </select></div>
+      <div class="row" style="margin-top:4px">
+        <button class="btn btn-primary" style="flex:1" onclick="saveIdea()">💾 Salvar</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>`);
+}
+function saveIdea(){
+  const title=document.getElementById("iTitle").value.trim();
+  if(!title)return;
+  const d={title,description:document.getElementById("iDesc").value,category:document.getElementById("iCat").value};
+  if(editingIdea){S.ideas=S.ideas.map(x=>x.id===editingIdea?{...x,...d}:x);}
+  else{S.ideas.push({...d,id:uid(),createdAt:nowISO()});}
+  closeModal();renderIdeas();
+}
+function deleteIdea(id){S.ideas=S.ideas.filter(x=>x.id!==id);renderIdeas();}
+async function analyzeIdea(id){
+  const idea=S.ideas.find(x=>x.id===id);
+  const btn=document.getElementById("aiBtn-"+id);
+  if(btn){btn.textContent="Analisando...";btn.disabled=true;}
+  const prompt=`Você é consultora de convites digitais. Analise:\nTítulo:${idea.title}\nDescrição:${idea.description}\nCategoria:${idea.category}\nRetorne APENAS JSON sem markdown:\n{"potencial_venda":0,"facilidade":0,"risco":"Baixo","tempo_estimado":"1-2 dias","retorno":"Médio","nota":0,"analise":"texto"}`;
+  try{const raw=await callAI(prompt);aiCache["idea_"+id]=JSON.parse(raw.replace(/```json|```/g,"").trim());}
+  catch{aiCache["idea_"+id]={potencial_venda:0,facilidade:0,risco:"—",tempo_estimado:"—",retorno:"—",nota:0,analise:"Não foi possível analisar."};}
+  renderIdeas();
+}
+
+// ─── CONVITES DO DIA ──────────────────────────────────────────
+function renderConvites(){
+  const today=new Date().toDateString();
+  const todayItems=S.convitesDodia.filter(p=>new Date(p.date).toDateString()===today);
+  const week=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=7).reduce((a,p)=>a+Number(p.qty),0);
+  const month=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=30).reduce((a,p)=>a+Number(p.qty),0);
+  const themeOpts=S.themes.map(t=>`<option value="${esc(t.name)}">`).join("");
+  document.getElementById("page-convites").innerHTML=`
+    <h2 class="sec-title">🎨 Convites do Dia</h2>
+    <p class="sec-desc">Registre os convites que você produziu hoje. O mesmo tema é somado automaticamente.</p>
+    <div class="row wrap" style="margin-bottom:18px">
+      <input list="themeListC" id="cTheme" placeholder="🎨 Tema..." style="flex:2;min-width:150px"/>
+      <datalist id="themeListC">${themeOpts}</datalist>
+      <input type="number" id="cQty" value="1" min="1" style="flex:1;min-width:70px"/>
+      <button class="btn btn-primary" onclick="addConvite()">+ Registrar</button>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <h3 style="font-weight:800;margin-bottom:12px">📅 Produzidos Hoje</h3>
+      ${todayItems.length===0?'<p style="color:var(--muted);font-size:13px">Nenhum registro hoje ainda.</p>':todayItems.map(p=>`
+        <div class="hist-item">
+          <span style="flex:1;font-weight:600">🎨 ${esc(p.theme)}</span>
+          <span style="font-weight:900;font-size:18px;color:var(--accent)">${p.qty}</span>
+          <span style="font-size:12px;color:var(--muted)">convites</span>
+          <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteConvite('${p.id}')">🗑️</button>
+        </div>`).join("")}
+    </div>
+    <div class="grid-2" style="margin-bottom:14px">
+      <div class="card" style="text-align:center">
+        <div style="font-size:38px;font-weight:900;color:var(--accent)">${week}</div>
+        <div style="color:var(--muted);font-size:13px">⚡ Esta semana</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:38px;font-weight:900;color:var(--accent2)">${month}</div>
+        <div style="color:var(--muted);font-size:13px">📈 Este mês</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-weight:800;margin-bottom:12px">📋 Histórico</h3>
+      ${[...S.convitesDodia].reverse().map(p=>`
+        <div class="hist-item">
+          <span style="flex:1;font-weight:700">🎨 ${esc(p.theme)}</span>
+          <span style="font-weight:800;color:var(--accent)">${p.qty} convites</span>
+          <span style="color:var(--muted)">📅 ${fmtDate(p.date)}</span>
+          <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteConvite('${p.id}')">🗑️</button>
+        </div>`).join("")}
+      ${S.convitesDodia.length===0?'<p style="color:var(--muted);font-size:13px">Nenhum registro ainda.</p>':""}
+    </div>`;
+}
+function addConvite(){
+  const theme=document.getElementById("cTheme").value.trim();
+  const qty=parseInt(document.getElementById("cQty").value)||1;
+  if(!theme)return;
+  const today=new Date().toDateString();
+  const ex=S.convitesDodia.find(p=>p.theme.toLowerCase()===theme.toLowerCase()&&new Date(p.date).toDateString()===today);
+  if(ex){S.convitesDodia=S.convitesDodia.map(p=>p.id===ex.id?{...p,qty:Number(p.qty)+qty}:p);}
+  else{S.convitesDodia.push({id:uid(),theme,qty,date:nowISO()});}
+  renderConvites(); renderDashboard();
+}
+function deleteConvite(id){S.convitesDodia=S.convitesDodia.filter(x=>x.id!==id);renderConvites();renderDashboard();}
+
+// ─── ORÇAMENTOS ───────────────────────────────────────────────
+function renderOrcamentos(){
+  document.getElementById("page-orcamentos").innerHTML=`
+    <h2 class="sec-title">💬 Orçamentos</h2>
+    <p class="sec-desc">Registre os temas que os clientes vieram pedir preço. Só o tema — sem valores. O sistema conta quantas vezes cada tema foi pedido.</p>
+    <div class="row" style="margin-bottom:18px">
+      <input id="orcInput" placeholder="💬 Tema do orçamento... ex: Safari, Tiana, Roblox" style="flex:1" onkeydown="if(event.key==='Enter')addOrc()"/>
+      <button class="btn btn-primary" style="margin-left:8px" onclick="addOrc()">+ Registrar</button>
+    </div>
+    ${[...S.orcamentos].sort((a,b)=>b.count-a.count).map(o=>{
+      const inLib=S.themes.find(t=>t.name.toLowerCase()===o.theme.toLowerCase());
+      const models=inLib?Number(inLib.models):0;
+      let insight=null,cor="#22c55e";
+      if(!inLib){insight="Você ainda não tem este tema na biblioteca!";cor="#ef4444";}
+      else if(o.count>=5&&models<10){insight=`Muita procura! Apenas ${models} modelo(s). Crie mais para atender bem.`;cor="#ef4444";}
+      else if(o.count>=3&&models<15){insight=`Boa procura. Considere ampliar sua biblioteca deste tema.`;cor="#f97316";}
+      else if(models>=15){insight=`Você está bem abastecida para esta demanda.`;cor="#22c55e";}
+      return `<div class="orc-item" style="border-left-color:${o.count>=5?"#ef4444":o.count>=3?"#f97316":"#22c55e"}">
+        <div class="row" style="margin-bottom:${insight?8:0}px">
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:15px">${esc(o.theme)}</div>
+            ${inLib?`<div style="font-size:12px;color:var(--muted);margin-top:2px">📚 ${models} modelo(s) na biblioteca</div>`:""}
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="incOrc('${o.id}')">+1</button>
+          <span class="badge" style="background:${o.count>=5?"#ef444422":"var(--surface)"};color:${o.count>=5?"#ef4444":"var(--text)"};font-size:17px;padding:3px 13px">${o.count}x</span>
+          <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteOrc('${o.id}')">🗑️</button>
+        </div>
+        ${insight?`<div style="font-size:12px;color:${cor};background:${cor}18;padding:7px 10px;border-radius:8px;border-left:3px solid ${cor}">🤖 ${insight}</div>`:""}
+      </div>`;}).join("")}
+    ${S.orcamentos.length===0?'<p style="color:var(--muted)">Nenhum orçamento registrado ainda.</p>':""}`;
+}
+function addOrc(){
+  const i=document.getElementById("orcInput");
+  const theme=i.value.trim();if(!theme)return;
+  const ex=S.orcamentos.find(o=>o.theme.toLowerCase()===theme.toLowerCase());
+  if(ex){S.orcamentos=S.orcamentos.map(o=>o.id===ex.id?{...o,count:o.count+1}:o);}
+  else{S.orcamentos.push({id:uid(),theme,count:1,createdAt:nowISO()});}
+  i.value="";renderOrcamentos();renderDashboard();
+}
+function incOrc(id){S.orcamentos=S.orcamentos.map(o=>o.id===id?{...o,count:o.count+1}:o);renderOrcamentos();renderDashboard();}
+function deleteOrc(id){S.orcamentos=S.orcamentos.filter(x=>x.id!==id);renderOrcamentos();renderDashboard();}
+
+// ─── LIBRARY ──────────────────────────────────────────────────
+function renderLibrary(){
+  document.getElementById("page-library").innerHTML=`
+    <div class="row" style="margin-bottom:8px">
+      <h2 class="sec-title" style="margin-bottom:0">📚 Biblioteca de Temas</h2>
+      <button class="btn btn-primary" style="margin-left:10px" onclick="openThemeModal(null)">+ Novo Tema</button>
+    </div>
+    <p class="sec-desc">Cadastre todos os seus temas e informe quantos modelos você possui. A IA cruza com orçamentos e produção e avisa quando você precisa criar mais.</p>
+    <div class="grid-themes">
+      ${S.themes.length===0?'<p style="color:var(--muted)">Nenhum tema ainda.</p>':S.themes.map(t=>{
+        const models=Number(t.models||0);
+        const orc=getOrcCount(t.name);
+        const prodMes=getMonthProd(t.name);
+        const prodTotal=getTotalProd(t.name);
+        let insight=null,cor="#22c55e";
+        if(models===0&&orc>0){insight=`Você tem ${orc} orçamento(s) mas nenhum modelo. Crie agora!`;cor="#ef4444";}
+        else if(orc>0&&models>0){
+          const ratio=orc/models;
+          if(ratio>=1){const need=Math.ceil(orc*2)-models;insight=`Alta procura! ${orc} orçamentos e ${models} modelos. Crie mais ${need} modelos — o cliente não deve buscar fora!`;cor="#ef4444";}
+          else if(ratio>=0.4){const need=Math.ceil(orc*1.5)-models;insight=`Demanda crescente. ${orc} orçamentos para ${models} modelos. Criar mais ${need} garante que o cliente fique com você.`;cor="#f97316";}
+          else{insight=`Bem abastecida. ${models} modelos para ${orc} orçamentos.`;cor="#22c55e";}
+        }else if(models>=30){insight=`Estoque grande (${models} modelos). Não é prioridade criar mais agora.`;cor="#3b82f6";}
+        return `<div class="card ch">
+          <div class="row" style="margin-bottom:10px">
+            <div style="flex:1;font-weight:800;font-size:15px">🎨 ${esc(t.name)}</div>
+            <button class="btn btn-ghost btn-sm" onclick="openThemeModal('${t.id}')">✏️</button>
+            <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteTheme('${t.id}')">🗑️</button>
+          </div>
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="mini-stat-val" style="color:var(--accent)">${models}</div><div class="mini-stat-lbl">MODELOS</div></div>
+            <div class="mini-stat"><div class="mini-stat-val" style="color:#ec4899">${orc}</div><div class="mini-stat-lbl">ORÇAMENTOS</div></div>
+            <div class="mini-stat"><div class="mini-stat-val" style="color:#f97316">${prodTotal}</div><div class="mini-stat-lbl">PRODUZIDOS</div></div>
+          </div>
+          ${insight?`<div style="font-size:12px;color:${cor};background:${cor}18;padding:9px 11px;border-radius:9px;border-left:3px solid ${cor};line-height:1.6;margin-bottom:8px">🤖 ${insight}</div>`:""}
+          ${t.observations?`<div style="font-size:12px;color:var(--muted)">${esc(t.observations)}</div>`:""}
+        </div>`;}).join("")}
+    </div>`;
+}
+function openThemeModal(id){
+  const t=id?S.themes.find(x=>x.id===id):{name:"",models:0,observations:""};
+  editingTheme=id;
+  openModal(`
+    <h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?"Editar Tema":"Novo Tema"}</h3>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label>Nome do Tema *</label><input id="tName" value="${esc(t.name)}" placeholder="ex: Safari, Tiana, Roblox"/></div>
+      <div><label>Qtd de Modelos que você tem</label><input type="number" id="tModels" value="${t.models||0}" min="0"/></div>
+      <div><label>Observações</label><textarea id="tObs">${esc(t.observations||"")}</textarea></div>
+      <div class="row" style="margin-top:4px">
+        <button class="btn btn-primary" style="flex:1" onclick="saveTheme()">💾 Salvar</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>`);
+}
+function saveTheme(){
+  const name=document.getElementById("tName").value.trim();
+  if(!name)return;
+  const d={name,models:parseInt(document.getElementById("tModels").value)||0,observations:document.getElementById("tObs").value};
+  if(editingTheme){S.themes=S.themes.map(t=>t.id===editingTheme?{...t,...d}:t);}
+  else{S.themes.push({...d,id:uid(),createdAt:nowISO()});}
+  closeModal();renderLibrary();renderDashboard();
+}
+function deleteTheme(id){S.themes=S.themes.filter(x=>x.id!==id);renderLibrary();renderDashboard();}
+
+// ─── AI CONSULTANT ────────────────────────────────────────────
+let chatHistory=[];
+function renderAI(){
+  const suggestions=["Quais temas devo criar primeiro?","Como está minha produtividade?","Quais temas têm mais procura?","O que focar essa semana?","Quais temas estão saturados?"];
+  document.getElementById("page-ai").innerHTML=`
+    <div style="max-width:760px">
+      <h2 class="sec-title">🤖 Consultora IA</h2>
+      <p class="sec-desc">Pergunte qualquer coisa sobre seu negócio. A IA já conhece todos os seus dados.</p>
+      <div class="row wrap" style="margin-bottom:14px">
+        ${suggestions.map(s=>`<button class="btn btn-ghost btn-sm" style="font-size:12px" onclick="setAIInput('${s}')">${s}</button>`).join("")}
+      </div>
+      <div class="chat-box" id="chatBox">
+        <div style="text-align:center;color:var(--muted);margin-top:60px">
+          <div style="font-size:36px;margin-bottom:8px">🤖</div>
+          <div>Olá! Sou sua consultora de convites digitais.</div>
+          <div style="font-size:13px;margin-top:3px">Escolha uma sugestão ou faça sua pergunta.</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <input id="aiInput" placeholder="Pergunte à sua consultora..." style="flex:1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"/>
+        <button class="btn btn-primary" id="aiSendBtn" style="margin-left:8px" onclick="sendAI()">Enviar</button>
+      </div>
+    </div>`;
+  renderChat();
+}
+function setAIInput(s){
+  const i=document.getElementById("aiInput");
+  if(i)i.value=s;
+}
+function renderChat(){
+  const box=document.getElementById("chatBox");
+  if(!box||chatHistory.length===0)return;
+  box.innerHTML=chatHistory.map(m=>`<div class="chat-msg ${m.role==="user"?"user":"ai"}">${esc(m.content)}</div>`).join("");
+  box.scrollTop=box.scrollHeight;
+}
+async function sendAI(){
+  const input=document.getElementById("aiInput");
+  const btn=document.getElementById("aiSendBtn");
+  const text=input?.value.trim();
+  if(!text)return;
+  chatHistory.push({role:"user",content:text});
+  input.value="";btn.disabled=true;btn.textContent="...";
+  renderChat();
+  // add loading
+  const box=document.getElementById("chatBox");
+  if(box){const d=document.createElement("div");d.className="chat-msg ai";d.id="loadingMsg";d.textContent="🤖 Pensando...";box.appendChild(d);box.scrollTop=box.scrollHeight;}
+  const byTheme={};S.convitesDodia.forEach(p=>{byTheme[p.theme]=(byTheme[p.theme]||0)+Number(p.qty);});
+  const ctx=`Você é consultora especialista em negócios de convites digitais. Responda em português, de forma direta e prática.
+DADOS: Tarefas abertas:${S.cards.filter(c=>c.columnId!=="concluido").length} | Orçamentos:${S.orcamentos.map(o=>o.theme+"("+o.count+"x)").join(",")||"nenhum"} | Biblioteca:${S.themes.map(t=>t.name+"("+t.models+"mod)").join(",")||"vazia"} | Produção:${Object.entries(byTheme).map(([t,n])=>t+":"+n).join(",")||"nenhum"}`;
+  const msgs=chatHistory.map((m,i)=>i===0?{role:"user",content:ctx+"\n\nPergunta: "+m.content}:m);
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:msgs})});
+    const d=await res.json();
+    const reply=d.content?.map(b=>b.text||"").join("")||"Sem resposta.";
+    chatHistory.push({role:"assistant",content:reply});
+  }catch{chatHistory.push({role:"assistant",content:"Erro ao conectar."});}
+  btn.disabled=false;btn.textContent="Enviar";
+  renderChat();
+}
+
+// ─── UTILS ────────────────────────────────────────────────────
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+// ─── INIT ─────────────────────────────────────────────────────
+setVerse();
+renderDashboard();
+</script>
+</body>
+</html>
