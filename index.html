@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Convites Studio 🎀</title>
+<title>Convites Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -121,12 +121,19 @@ label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bot
 
 <!-- HEADER -->
 <div class="header" id="header">
-  <span style="font-size:26px">🎀</span>
+  <!-- LOGO -->
+  <div style="position:relative;cursor:pointer" onclick="document.getElementById('logoUpload').click()" title="Clique para trocar a logo">
+    <img id="logoImg" src="" alt="" style="width:42px;height:42px;border-radius:10px;object-fit:cover;display:none;border:2px solid var(--border)"/>
+    <div id="logoPlaceholder" style="width:42px;height:42px;border-radius:10px;background:var(--surface);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px">📷</div>
+    <input type="file" id="logoUpload" accept="image/*" onchange="changeLogo(event)" style="display:none"/>
+  </div>
+  <!-- TITLE -->
   <div>
-    <div class="logo-title">Convites Studio</div>
+    <div id="businessTitle" class="logo-title" onclick="editTitle()" title="Clique para editar o nome" style="cursor:pointer">Convites Studio</div>
     <div style="font-size:10px;color:var(--muted)">Gestão Inteligente</div>
   </div>
   <div style="flex:1"></div>
+  <!-- VERSE -->
   <div class="verse-box" id="verseBox">
     <span style="font-size:15px">✝️</span>
     <div>
@@ -141,23 +148,19 @@ label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bot
 <div class="tabs" id="tabs">
   <button class="tab active" data-tab="dashboard">🏠 Início</button>
   <button class="tab" data-tab="kanban">📋 Tarefas</button>
-  <button class="tab" data-tab="capture">⚡ Captura</button>
   <button class="tab" data-tab="ideas">💡 Ideias</button>
   <button class="tab" data-tab="convites">🎨 Convites do Dia</button>
   <button class="tab" data-tab="orcamentos">💬 Orçamentos</button>
   <button class="tab" data-tab="library">📚 Biblioteca</button>
-  <button class="tab" data-tab="ai">🤖 Consultora</button>
 </div>
 
 <!-- PAGES -->
 <div id="page-dashboard" class="content fade-in"></div>
 <div id="page-kanban" class="content kanban-mode fade-in hidden"></div>
-<div id="page-capture" class="content fade-in hidden"></div>
 <div id="page-ideas" class="content fade-in hidden"></div>
 <div id="page-convites" class="content fade-in hidden"></div>
 <div id="page-orcamentos" class="content fade-in hidden"></div>
 <div id="page-library" class="content fade-in hidden"></div>
-<div id="page-ai" class="content fade-in hidden"></div>
 
 <!-- MODAL -->
 <div class="modal-overlay hidden" id="modalOverlay" onclick="if(event.target===this)closeModal()">
@@ -207,6 +210,18 @@ const nowISO=()=>new Date().toISOString();
 const fmtDate=iso=>iso?new Date(iso).toLocaleDateString('pt-BR'):'—';
 const diffDays=(a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
 
+const defaultState = {
+  columns:[
+    {id:"urgente",   title:"🔥 Urgente",             color:"#ef4444"},
+    {id:"hoje",      title:"📅 Fazer Hoje",           color:"#f97316"},
+    {id:"andamento", title:"⚙️ Em Andamento",         color:"#3b82f6"},
+    {id:"ideias_col",title:"💡 Ideias",               color:"#eab308"},
+    {id:"criar",     title:"🎨 Convites para Criar",  color:"#ec4899"},
+    {id:"melhorias", title:"📈 Melhorias do Negócio", color:"#14b8a6"},
+    {id:"concluido", title:"✅ Concluído",            color:"#22c55e"},
+  ],
+  cards:[],ideas:[],convitesDodia:[],orcamentos:[],themes:[],dark:false,tab:"dashboard"
+};
 let S = {
   columns:[
     {id:"urgente",   title:"🔥 Urgente",             color:"#ef4444"},
@@ -218,7 +233,6 @@ let S = {
     {id:"concluido", title:"✅ Concluído",            color:"#22c55e"},
   ],
   cards:[],
-  quickNotes:[],
   ideas:[],
   convitesDodia:[],
   orcamentos:[],
@@ -229,17 +243,6 @@ let S = {
 
 let dragCardId=null, dragColId=null;
 let editingCard=null, editingIdea=null, editingTheme=null;
-let aiCache={};
-
-// ─── AI ───────────────────────────────────────────────────────
-async function callAI(prompt){
-  const r=await fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})
-  });
-  const d=await r.json();
-  return d.content?.map(b=>b.text||"").join("")||"Sem análise.";
-}
 
 // ─── VERSE ────────────────────────────────────────────────────
 function setVerse(){
@@ -284,12 +287,10 @@ function render(){
   const t=S.tab;
   if(t==="dashboard") renderDashboard();
   else if(t==="kanban") renderKanban();
-  else if(t==="capture") renderCapture();
   else if(t==="ideas") renderIdeas();
   else if(t==="convites") renderConvites();
   else if(t==="orcamentos") renderOrcamentos();
   else if(t==="library") renderLibrary();
-  else if(t==="ai") renderAI();
 }
 
 // ─── HELPERS ──────────────────────────────────────────────────
@@ -383,6 +384,7 @@ function renderDashboard(){
         <div class="stat-label">${s.label}</div>
       </div>`).join("")}
     </div>
+    <div id="dashAlerts"></div>
     <div class="grid-2" style="margin-bottom:16px">
       <div class="card">
         <h3 style="font-weight:800;margin-bottom:12px;color:var(--accent)">🏆 Mais Produzidos</h3>
@@ -408,29 +410,42 @@ function renderDashboard(){
       <h3 style="font-weight:800;margin-bottom:14px;font-size:16px">📊 Análise do Mês — Necessidade de Modelos</h3>
       ${buildAnaliseMes()}
     </div>
-    <div class="card">
-      <div class="row" style="margin-bottom:12px">
-        <h3 style="font-weight:800;flex:1">🤖 Recomendações da IA</h3>
-        <button class="btn btn-primary btn-sm" onclick="runDashAI()" id="dashAIBtn">Analisar Agora</button>
-      </div>
-      <div id="dashAIResult" style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">
-        ${aiCache.dashboard||'<span style="color:var(--muted)">Clique em "Analisar Agora" para receber recomendações.</span>'}
-      </div>
-    </div>`;
+`;
+  buildDashAlerts();
 }
-async function runDashAI(){
-  const btn=document.getElementById("dashAIBtn");
-  btn.textContent="Analisando...";btn.disabled=true;
-  const byTheme={};S.convitesDodia.forEach(p=>{byTheme[p.theme]=(byTheme[p.theme]||0)+Number(p.qty);});
-  const prompt=`Você é consultora de negócios de convites digitais. Dados:
-- Tarefas abertas: ${S.cards.filter(c=>c.columnId!=="concluido").length}
-- Orçamentos: ${S.orcamentos.map(o=>`${o.theme}(${o.count}x)`).join(", ")||"nenhum"}
-- Biblioteca: ${S.themes.map(t=>`${t.name}(${t.models} modelos)`).join(", ")||"vazia"}
-- Produção por tema: ${Object.entries(byTheme).map(([t,n])=>`${t}:${n}`).join(", ")||"nenhum"}
-Gere 3 recomendações práticas numeradas de 1 a 3, curtas e em português.`;
-  try{const r=await callAI(prompt);aiCache.dashboard=r;document.getElementById("dashAIResult").textContent=r;}
-  catch{document.getElementById("dashAIResult").textContent="Erro ao conectar.";}
-  btn.textContent="Analisar Agora";btn.disabled=false;
+
+// ─── DASH ALERTS ─────────────────────────────────────────────
+function buildDashAlerts(){
+  const el=document.getElementById("dashAlerts");
+  if(!el)return;
+  const alerts=[];
+  // overdue tasks
+  const overdue=S.cards.filter(c=>c.columnId!=="concluido"&&diffDays(c.createdAt,nowISO())>=1);
+  if(overdue.length>0){
+    alerts.push(`<div style="background:#ef444415;border:1.5px solid #ef444444;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:4px solid #ef4444">
+      <div style="font-weight:800;color:#ef4444;margin-bottom:8px;font-size:14px">⚠️ ${overdue.length} tarefa(s) atrasada(s)</div>
+      ${overdue.map(c=>`<div style="font-size:13px;padding:4px 0;border-bottom:1px solid #ef444422;display:flex;gap:8px;align-items:center">
+        <span style="flex:1;font-weight:600">${esc(c.title)}</span>
+        <span style="color:#ef4444;font-size:12px;font-weight:700">${diffDays(c.createdAt,nowISO())} dia(s) atrasada</span>
+      </div>`).join("")}
+    </div>`);
+  }
+  // themes with high demand and few models
+  const urgentThemes=S.themes.filter(t=>{
+    const orc=getOrcCount(t.name);
+    const models=Number(t.models||0);
+    return orc>=3&&models<10;
+  });
+  if(urgentThemes.length>0){
+    alerts.push(`<div style="background:#f9731615;border:1.5px solid #f9731644;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:4px solid #f97316">
+      <div style="font-weight:800;color:#f97316;margin-bottom:8px;font-size:14px">🔥 Temas com alta procura e poucos modelos</div>
+      ${urgentThemes.map(t=>`<div style="font-size:13px;padding:4px 0;border-bottom:1px solid #f9731622;display:flex;gap:8px;align-items:center">
+        <span style="flex:1;font-weight:600">🎨 ${esc(t.name)}</span>
+        <span style="color:#f97316;font-size:12px;font-weight:700">${getOrcCount(t.name)} orçamentos · ${t.models} modelos</span>
+      </div>`).join("")}
+    </div>`);
+  }
+  el.innerHTML=alerts.length>0?alerts.join(""):"";
 }
 
 // ─── KANBAN ───────────────────────────────────────────────────
@@ -471,11 +486,16 @@ function renderCard(card,col){
   const tags=card.tags?card.tags.split(",").map(t=>`<span class="tag" style="background:var(--border)">${t.trim()}</span>`).join(""):"";
   const completed=col.id==="concluido"&&card.completedAt?`<div style="font-size:11px;color:#22c55e;margin-top:5px">✅ ${fmtDate(card.completedAt)} · ${diffDays(card.createdAt,card.completedAt)} dias</div>`:"";
   const completeBtn=col.id!=="concluido"?`<button class="btn btn-primary btn-sm" style="flex:1" onclick="completeCard('${card.id}')">✅ Concluir</button>`:"";
+  // overdue: created before today and not done
+  const daysOld = col.id!=="concluido" ? diffDays(card.createdAt, nowISO()) : 0;
+  const overdue = daysOld >= 1;
+  const overdueBar = overdue ? `<div style="font-size:11px;color:#ef4444;background:#ef444415;padding:4px 8px;border-radius:6px;margin-bottom:7px;font-weight:700">⚠️ Atrasada ${daysOld} dia(s)</div>` : "";
   return `<div class="k-card" id="kcard-${card.id}" draggable="true"
-    style="border-left-color:${pc}"
+    style="border-left-color:${overdue?"#ef4444":pc};${overdue?"box-shadow:0 0 0 1.5px #ef444444;":""}"
     ondragstart="cardDragStart('${card.id}')">
     <div style="font-weight:700;font-size:13px;margin-bottom:3px">${card.title}</div>
     ${card.description?`<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${card.description}</div>`:""}
+    ${overdueBar}
     <div style="margin-bottom:6px">
       ${card.priority?`<span class="tag" style="background:${pc}22;color:${pc}">${card.priority}</span>`:""}
       ${tags}
@@ -558,39 +578,6 @@ function saveCard(){
   closeModal();render();
 }
 
-// ─── CAPTURE ──────────────────────────────────────────────────
-function renderCapture(){
-  document.getElementById("page-capture").innerHTML=`
-    <h2 class="sec-title">⚡ Captura Rápida</h2>
-    <p class="sec-desc">Registre qualquer ideia agora, organize depois.</p>
-    <div class="row" style="margin-bottom:14px">
-      <input id="noteInput" placeholder="💭 Digite qualquer ideia ou tarefa e pressione Enter..." style="flex:1" onkeydown="if(event.key==='Enter')addNote()"/>
-      <button class="btn btn-primary" style="margin-left:8px" onclick="addNote()">Capturar ⚡</button>
-    </div>
-    ${S.quickNotes.length===0?'<p style="color:var(--muted)">Nenhuma anotação ainda.</p>':S.quickNotes.map(n=>`
-      <div class="note-item">
-        <div style="flex:1">
-          <div style="font-weight:600">${esc(n.text)}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${fmtDate(n.createdAt)}</div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="noteToCard('${n.id}')">→ Tarefa</button>
-        <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteNote('${n.id}')">🗑️</button>
-      </div>`).join("")}`;
-}
-function addNote(){
-  const i=document.getElementById("noteInput");
-  if(!i.value.trim())return;
-  S.quickNotes.unshift({id:uid(),text:i.value.trim(),createdAt:nowISO()});
-  i.value="";renderCapture();
-}
-function noteToCard(id){
-  const n=S.quickNotes.find(x=>x.id===id);
-  S.quickNotes=S.quickNotes.filter(x=>x.id!==id);
-  editingCard=null;
-  openCardModal(null,"hoje");
-  setTimeout(()=>{if(document.getElementById("mTitle"))document.getElementById("mTitle").value=n.text;},50);
-}
-function deleteNote(id){S.quickNotes=S.quickNotes.filter(x=>x.id!==id);renderCapture();}
 
 // ─── IDEAS ────────────────────────────────────────────────────
 function renderIdeas(){
@@ -622,7 +609,7 @@ function renderIdeas(){
               <div class="mini-stat"><div class="mini-stat-val" style="font-size:13px">${ai.tempo_estimado}</div><div class="mini-stat-lbl">TEMPO</div></div>
             </div>
             <div style="border-top:1px solid var(--border);padding-top:7px;color:var(--muted);line-height:1.5">🤖 ${ai.analise}</div>
-          </div>`:`<button class="btn btn-primary btn-sm" style="width:100%" id="aiBtn-${idea.id}" onclick="analyzeIdea('${idea.id}')">🤖 Analisar com IA</button>`}
+          </div>`:""}
         </div>`;}).join("")}
     </div>`;
 }
@@ -652,15 +639,6 @@ function saveIdea(){
   closeModal();renderIdeas();
 }
 function deleteIdea(id){S.ideas=S.ideas.filter(x=>x.id!==id);renderIdeas();}
-async function analyzeIdea(id){
-  const idea=S.ideas.find(x=>x.id===id);
-  const btn=document.getElementById("aiBtn-"+id);
-  if(btn){btn.textContent="Analisando...";btn.disabled=true;}
-  const prompt=`Você é consultora de convites digitais. Analise:\nTítulo:${idea.title}\nDescrição:${idea.description}\nCategoria:${idea.category}\nRetorne APENAS JSON sem markdown:\n{"potencial_venda":0,"facilidade":0,"risco":"Baixo","tempo_estimado":"1-2 dias","retorno":"Médio","nota":0,"analise":"texto"}`;
-  try{const raw=await callAI(prompt);aiCache["idea_"+id]=JSON.parse(raw.replace(/```json|```/g,"").trim());}
-  catch{aiCache["idea_"+id]={potencial_venda:0,facilidade:0,risco:"—",tempo_estimado:"—",retorno:"—",nota:0,analise:"Não foi possível analisar."};}
-  renderIdeas();
-}
 
 // ─── CONVITES DO DIA ──────────────────────────────────────────
 function renderConvites(){
@@ -827,72 +805,90 @@ function saveTheme(){
 }
 function deleteTheme(id){S.themes=S.themes.filter(x=>x.id!==id);renderLibrary();renderDashboard();}
 
-// ─── AI CONSULTANT ────────────────────────────────────────────
-let chatHistory=[];
-function renderAI(){
-  const suggestions=["Quais temas devo criar primeiro?","Como está minha produtividade?","Quais temas têm mais procura?","O que focar essa semana?","Quais temas estão saturados?"];
-  document.getElementById("page-ai").innerHTML=`
-    <div style="max-width:760px">
-      <h2 class="sec-title">🤖 Consultora IA</h2>
-      <p class="sec-desc">Pergunte qualquer coisa sobre seu negócio. A IA já conhece todos os seus dados.</p>
-      <div class="row wrap" style="margin-bottom:14px">
-        ${suggestions.map(s=>`<button class="btn btn-ghost btn-sm" style="font-size:12px" onclick="setAIInput('${s}')">${s}</button>`).join("")}
-      </div>
-      <div class="chat-box" id="chatBox">
-        <div style="text-align:center;color:var(--muted);margin-top:60px">
-          <div style="font-size:36px;margin-bottom:8px">🤖</div>
-          <div>Olá! Sou sua consultora de convites digitais.</div>
-          <div style="font-size:13px;margin-top:3px">Escolha uma sugestão ou faça sua pergunta.</div>
-        </div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <input id="aiInput" placeholder="Pergunte à sua consultora..." style="flex:1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI();}"/>
-        <button class="btn btn-primary" id="aiSendBtn" style="margin-left:8px" onclick="sendAI()">Enviar</button>
-      </div>
-    </div>`;
-  renderChat();
-}
-function setAIInput(s){
-  const i=document.getElementById("aiInput");
-  if(i)i.value=s;
-}
-function renderChat(){
-  const box=document.getElementById("chatBox");
-  if(!box||chatHistory.length===0)return;
-  box.innerHTML=chatHistory.map(m=>`<div class="chat-msg ${m.role==="user"?"user":"ai"}">${esc(m.content)}</div>`).join("");
-  box.scrollTop=box.scrollHeight;
-}
-async function sendAI(){
-  const input=document.getElementById("aiInput");
-  const btn=document.getElementById("aiSendBtn");
-  const text=input?.value.trim();
-  if(!text)return;
-  chatHistory.push({role:"user",content:text});
-  input.value="";btn.disabled=true;btn.textContent="...";
-  renderChat();
-  // add loading
-  const box=document.getElementById("chatBox");
-  if(box){const d=document.createElement("div");d.className="chat-msg ai";d.id="loadingMsg";d.textContent="🤖 Pensando...";box.appendChild(d);box.scrollTop=box.scrollHeight;}
-  const byTheme={};S.convitesDodia.forEach(p=>{byTheme[p.theme]=(byTheme[p.theme]||0)+Number(p.qty);});
-  const ctx=`Você é consultora especialista em negócios de convites digitais. Responda em português, de forma direta e prática.
-DADOS: Tarefas abertas:${S.cards.filter(c=>c.columnId!=="concluido").length} | Orçamentos:${S.orcamentos.map(o=>o.theme+"("+o.count+"x)").join(",")||"nenhum"} | Biblioteca:${S.themes.map(t=>t.name+"("+t.models+"mod)").join(",")||"vazia"} | Produção:${Object.entries(byTheme).map(([t,n])=>t+":"+n).join(",")||"nenhum"}`;
-  const msgs=chatHistory.map((m,i)=>i===0?{role:"user",content:ctx+"\n\nPergunta: "+m.content}:m);
-  try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:msgs})});
-    const d=await res.json();
-    const reply=d.content?.map(b=>b.text||"").join("")||"Sem resposta.";
-    chatHistory.push({role:"assistant",content:reply});
-  }catch{chatHistory.push({role:"assistant",content:"Erro ao conectar."});}
-  btn.disabled=false;btn.textContent="Enviar";
-  renderChat();
-}
 
 // ─── UTILS ────────────────────────────────────────────────────
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
+// ─── EXPORT / IMPORT ─────────────────────────────────────────
+function exportData(){
+  const data=JSON.stringify(S,null,2);
+  const blob=new Blob([data],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  const date=new Date().toLocaleDateString("pt-BR").replace(/\//g,"-");
+  a.href=url;a.download=`convites-studio-backup-${date}.json`;
+  a.click();URL.revokeObjectURL(url);
+}
+function importData(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const imported=JSON.parse(e.target.result);
+      if(!imported.columns||!imported.cards) throw new Error("Arquivo inválido");
+      if(confirm("Isso vai substituir todos os dados atuais. Confirma?")){
+        S={...defaultState,...imported};
+        render();
+        alert("✅ Dados importados com sucesso!");
+      }
+    }catch{alert("❌ Arquivo inválido. Use apenas backups gerados pelo Convites Studio.");}
+  };
+  reader.readAsText(file);
+  event.target.value="";
+}
+
+// ─── LOGO & TITLE ────────────────────────────────────────────
+function changeLogo(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById("logoImg");
+    const placeholder=document.getElementById("logoPlaceholder");
+    img.src=e.target.result;
+    img.style.display="block";
+    placeholder.style.display="none";
+    localStorage.setItem("convites_logo",e.target.result);
+  };
+  reader.readAsDataURL(file);
+  event.target.value="";
+}
+function editTitle(){
+  const current=document.getElementById("businessTitle").textContent;
+  const novo=prompt("Nome do seu negócio:",current);
+  if(novo&&novo.trim()){
+    document.getElementById("businessTitle").textContent=novo.trim();
+    localStorage.setItem("convites_title",novo.trim());
+  }
+}
+function loadLogoAndTitle(){
+  const logo=localStorage.getItem("convites_logo");
+  if(logo){
+    const img=document.getElementById("logoImg");
+    const placeholder=document.getElementById("logoPlaceholder");
+    img.src=logo;img.style.display="block";placeholder.style.display="none";
+  }
+  const title=localStorage.getItem("convites_title");
+  if(title) document.getElementById("businessTitle").textContent=title;
+}
+
 // ─── INIT ─────────────────────────────────────────────────────
 setVerse();
+loadLogoAndTitle();
 renderDashboard();
 </script>
+<!-- FOOTER -->
+<div style="background:var(--card);border-top:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px">
+  <button class="btn btn-ghost btn-sm" onclick="exportData()" style="font-size:13px;display:flex;align-items:center;gap:6px">
+    💾 Exportar Dados
+  </button>
+  <label class="btn btn-ghost btn-sm" style="cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px">
+    📂 Importar Dados
+    <input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
+  </label>
+  <span style="color:var(--border)">|</span>
+  <span style="font-size:12px;color:var(--muted)">Convites Studio · Gestão Inteligente</span>
+</div>
 </body>
 </html>
