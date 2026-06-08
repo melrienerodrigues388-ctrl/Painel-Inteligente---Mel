@@ -166,8 +166,9 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 const defaultColumns=[
   {id:'urgente',title:'🔥 Urgente',color:'#ef4444'},
   {id:'hoje',title:'📅 Fazer Hoje',color:'#f97316'},
-  {id:'andamento',title:'⚙️ Em Andamento',color:'#3b82f6'},
-  {id:'ideias_col',title:'💡 Ideias',color:'#eab308'},
+  {id:'semana',title:'📆 Durante a Semana',color:'#3b82f6'},
+  {id:'mes',title:'🗓️ Durante o Mês',color:'#a855f7'},
+  {id:'andamento',title:'⚙️ Em Andamento',color:'#06b6d4'},
   {id:'criar',title:'🎨 Convites para Criar',color:'#ec4899'},
   {id:'melhorias',title:'📈 Melhorias do Negócio',color:'#14b8a6'},
   {id:'concluido',title:'✅ Concluído',color:'#22c55e'},
@@ -212,20 +213,23 @@ function render(){
 
 // ═══ THEME ANALYSIS ═══
 function themeInsight(models,orc){
-  // Analysis based on healthy minimum, not just orders
-  if(models===0){return{text:'Nenhum modelo cadastrado. Crie modelos para atender este tema!',cor:'#ef4444'};}
-  if(models<10){
-    if(orc>=3)return{text:`Poucos modelos (${models}) e alta procura (${orc} orçamentos). Cliente pode não encontrar variedade — crie pelo menos 15 modelos.`,cor:'#ef4444'};
-    return{text:`Poucos modelos (${models}). Para garantir variedade ao cliente, o ideal é ter pelo menos 15 modelos.`,cor:'#ef4444'};
+  // Unified logic used everywhere: library, dashboard analysis, orders
+  const orcInfo=orc>0?` · ${orc} orçamento(s) recebido(s)`:'';
+  if(models===0){
+    return{text:'Nenhum modelo cadastrado. Crie modelos para este tema!',cor:'#ef4444',level:'insuficiente'};
   }
-  if(models<20){
-    if(orc>=5)return{text:`Quantidade razoável (${models} modelos) mas alta procura (${orc} orçamentos). Amplie para 20+ modelos.`,cor:'#f97316'};
-    return{text:`Quantidade razoável (${models} modelos). Pode ampliar para garantir mais variedade ao cliente.`,cor:'#f97316'};
+  if(models<=4){
+    const falta=15-models;
+    return{text:`⚠️ Estoque insuficiente (${models} modelo(s)). Você precisa criar mais ${falta} modelos para oferecer variedade mínima ao cliente${orcInfo}.`,cor:'#ef4444',level:'insuficiente'};
   }
-  if(models<35){
-    return{text:`Boa variedade! (${models} modelos). Cliente encontra opções sem precisar buscar fora. ${orc>0?`Você tem ${orc} orçamento(s) recente(s).`:''}`,cor:'#22c55e'};
+  if(models<=14){
+    const falta=15-models;
+    return{text:`📦 Estoque básico (${models} modelo(s)). Crie mais ${falta} modelo(s) para atingir o nível mínimo recomendado de 15${orcInfo}.`,cor:'#f97316',level:'basico'};
   }
-  return{text:`Biblioteca ampla (${models} modelos). Excelente variedade para o cliente! Não é prioridade criar mais agora.`,cor:'#3b82f6'};
+  if(models>=15&&models<=29){
+    return{text:`✅ Bem abastecida (${models} modelo(s)). Cliente encontra variedade sem precisar buscar fora${orcInfo}.`,cor:'#22c55e',level:'bom'};
+  }
+  return{text:`🌟 Biblioteca ampla (${models} modelo(s)). Excelente variedade! Não é prioridade criar mais agora${orcInfo}.`,cor:'#3b82f6',level:'otimo'};
 }
 
 // ═══ STATS HELPERS ═══
@@ -424,7 +428,12 @@ function deleteCard(id){S.cards=S.cards.filter(c=>c.id!==id);render();}
 function openCardModal(id,defaultCol){
   const card=id?S.cards.find(c=>c.id===id):{columnId:defaultCol||'hoje',title:'',description:'',priority:'Média',tags:'',observations:'',dueDate:''};
   editingCard=id;
-  const colOpts=S.columns.filter(c=>c.id!=='concluido').map(c=>`<option value="${c.id}"${card.columnId===c.id?' selected':''}>${c.title}</option>`).join('');
+  const priorityCols=[
+    {id:'hoje',label:'📅 Fazer Hoje'},
+    {id:'semana',label:'📆 Durante a Semana'},
+    {id:'mes',label:'🗓️ Durante o Mês'},
+  ];
+  const colOpts=priorityCols.map(c=>`<option value="${c.id}"${card.columnId===c.id?' selected':''}>${c.label}</option>`).join('');
   const today=new Date().toISOString().slice(0,10);
   openModal(`
     <h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar Cartão':'Novo Cartão'}</h3>
