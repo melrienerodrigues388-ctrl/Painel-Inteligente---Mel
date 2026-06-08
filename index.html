@@ -212,24 +212,29 @@ function render(){
 }
 
 // ═══ THEME ANALYSIS ═══
-function themeInsight(models,orc){
-  // Unified logic used everywhere: library, dashboard analysis, orders
-  const orcInfo=orc>0?` · ${orc} orçamento(s) recebido(s)`:'';
+function themeInsight(models,orc,prodMes){
+  const orcInfo=orc>0?` · ${orc} orçamento(s)`:'';
+  const prodInfo=prodMes>0?` · ${prodMes} produzido(s) este mês`:'';
+  // Priority for Análise do Mês
+  let priority='Baixa';
+  if(models<=4||(models<=14&&orc>=3))priority='Alta';
+  else if(models<=14||(models<=29&&orc>=5))priority='Média';
+
   if(models===0){
-    return{text:'Nenhum modelo cadastrado. Crie modelos para este tema!',cor:'#ef4444',level:'insuficiente'};
+    return{text:'Nenhum modelo cadastrado. Crie modelos para este tema!',cor:'#ef4444',status:'Estoque Insuficiente',priority:'Alta'};
   }
   if(models<=4){
     const falta=15-models;
-    return{text:`⚠️ Estoque insuficiente (${models} modelo(s)). Você precisa criar mais ${falta} modelos para oferecer variedade mínima ao cliente${orcInfo}.`,cor:'#ef4444',level:'insuficiente'};
+    return{text:`Estoque insuficiente (${models} modelo(s)). Crie mais ${falta} modelos para variedade mínima${orcInfo}${prodInfo}.`,cor:'#ef4444',status:'Estoque Insuficiente',priority:'Alta'};
   }
   if(models<=14){
     const falta=15-models;
-    return{text:`📦 Estoque básico (${models} modelo(s)). Crie mais ${falta} modelo(s) para atingir o nível mínimo recomendado de 15${orcInfo}.`,cor:'#f97316',level:'basico'};
+    return{text:`Estoque básico (${models} modelo(s)). Crie mais ${falta} modelo(s) para atingir o mínimo recomendado${orcInfo}${prodInfo}.`,cor:'#f97316',status:'Estoque Básico',priority};
   }
-  if(models>=15&&models<=29){
-    return{text:`✅ Bem abastecida (${models} modelo(s)). Cliente encontra variedade sem precisar buscar fora${orcInfo}.`,cor:'#22c55e',level:'bom'};
+  if(models<=29){
+    return{text:`Bem abastecida (${models} modelo(s)). Cliente encontra variedade sem buscar fora${orcInfo}${prodInfo}.`,cor:'#22c55e',status:'Bem Abastecida',priority:'Baixa'};
   }
-  return{text:`🌟 Biblioteca ampla (${models} modelo(s)). Excelente variedade! Não é prioridade criar mais agora${orcInfo}.`,cor:'#3b82f6',level:'otimo'};
+  return{text:`Biblioteca ampla (${models} modelo(s)). Excelente variedade! Não é prioridade criar mais${orcInfo}${prodInfo}.`,cor:'#3b82f6',status:'Biblioteca Ampla',priority:'Baixa'};
 }
 
 // ═══ STATS HELPERS ═══
@@ -271,18 +276,26 @@ function renderDashboard(){
   // analise mes
   const now=new Date(),mes=now.toLocaleString('pt-BR',{month:'long',year:'numeric'});
   let analiseMes='';
-  S.themes.forEach(t=>{
+  // Sort by priority: Alta first
+  const themesSorted=[...S.themes].sort((a,b)=>{
+    const pa=themeInsight(Number(a.models||0),getOrcCount(a.name),getMonthProd(a.name)).priority;
+    const pb=themeInsight(Number(b.models||0),getOrcCount(b.name),getMonthProd(b.name)).priority;
+    return{Alta:0,Média:1,Baixa:2}[pa]-{Alta:0,Média:1,Baixa:2}[pb];
+  });
+  themesSorted.forEach(t=>{
     const orc=getOrcCount(t.name),prodMes=getMonthProd(t.name),models=Number(t.models||0);
-    if(orc===0&&prodMes===0)return;
-    const insight=themeInsight(models,orc);
-    const meta=models<15?15:models<20?20:models<35?35:models;
-    const precisa=Math.max(0,meta-models);
+    if(orc===0&&prodMes===0&&models>=15)return;
+    const insight=themeInsight(models,orc,prodMes);
+    const precisa=models<15?15-models:models<30&&orc>=5?30-models:0;
+    const priColor={Alta:'#ef4444',Média:'#f97316',Baixa:'#22c55e'}[insight.priority];
     analiseMes+=`<div style="background:${insight.cor}10;border-left:4px solid ${insight.cor};border-radius:10px;padding:12px;margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
         <strong style="color:${insight.cor};font-size:14px">🎨 ${esc(t.name)}</strong>
-        ${precisa>0?`<span style="margin-left:auto;background:${insight.cor}22;color:${insight.cor};padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700">+${precisa} necessários</span>`:''}
+        <span style="background:${priColor}22;color:${priColor};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:800">Prioridade ${insight.priority}</span>
+        <span style="background:${insight.cor}22;color:${insight.cor};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">${insight.status}</span>
+        ${precisa>0?`<span style="margin-left:auto;background:#ef444422;color:#ef4444;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">+${precisa} necessários</span>`:''}
       </div>
-      <p style="font-size:13px;line-height:1.7">Este mês: <strong>${orc}</strong> orçamento(s) · <strong>${prodMes}</strong> produzido(s) · <strong>${models}</strong> modelo(s). ${insight.text}</p>
+      <p style="font-size:13px;line-height:1.7">${insight.text}</p>
     </div>`;
   });
 
@@ -411,38 +424,55 @@ function deleteCol(id){if(confirm('Excluir coluna?')){S.columns=S.columns.filter
 function completeCard(id,colId){
   const card=S.cards.find(c=>c.id===id);
   S.cards=S.cards.map(c=>c.id===id?{...c,columnId:'concluido',completedAt:nowISO()}:c);
-  // if it was a "criar" card, update library
-  if(colId==='criar'&&card){
-    const match=card.title.match(/(\d+)\s+modelo[s]?\s+de\s+(.+)/i);
-    if(match){
-      const qty=parseInt(match[1]),themeName=match[2].trim();
-      const existing=S.themes.find(t=>t.name.toLowerCase()===themeName.toLowerCase());
-      if(existing){S.themes=S.themes.map(t=>t.id===existing.id?{...t,models:Number(t.models)+qty}:t);}
-      else{S.themes.push({id:uid(),name:themeName,models:qty,observations:'Criado automaticamente',createdAt:nowISO()});}
+  if(card&&(colId==='criar'||card.columnId==='criar')){
+    // auto card from library
+    if(card.auto&&card.themeName){
+      const match=card.title.match(/(\d+)/);
+      if(match){
+        const qty=parseInt(match[1]);
+        const existing=S.themes.find(t=>t.name.toLowerCase()===card.themeName.toLowerCase());
+        if(existing){
+          const newModels=Number(existing.models)+qty;
+          S.themes=S.themes.map(t=>t.id===existing.id?{...t,models:newModels}:t);
+          autoCreateCard(card.themeName,newModels);
+        }
+      }
+    } else {
+      const match=card.title.match(/(\d+)\s+modelo[s]?\s+de\s+(.+)/i);
+      if(match){
+        const qty=parseInt(match[1]),themeName=match[2].trim();
+        const existing=S.themes.find(t=>t.name.toLowerCase()===themeName.toLowerCase());
+        if(existing){
+          const newModels=Number(existing.models)+qty;
+          S.themes=S.themes.map(t=>t.id===existing.id?{...t,models:newModels}:t);
+          autoCreateCard(themeName,newModels);
+        }
+      }
     }
   }
   renderKanban();
 }
 function deleteCard(id){S.cards=S.cards.filter(c=>c.id!==id);render();}
 
+function colByDate(dueDate){
+  if(!dueDate)return'hoje';
+  const days=diffDays(nowISO(),dueDate);
+  if(days<=0)return'hoje';
+  if(days<=7)return'semana';
+  return'mes';
+}
 function openCardModal(id,defaultCol){
-  const card=id?S.cards.find(c=>c.id===id):{columnId:defaultCol||'hoje',title:'',description:'',priority:'Média',tags:'',observations:'',dueDate:''};
-  editingCard=id;
-  const priorityCols=[
-    {id:'hoje',label:'📅 Fazer Hoje'},
-    {id:'semana',label:'📆 Durante a Semana'},
-    {id:'mes',label:'🗓️ Durante o Mês'},
-  ];
-  const colOpts=priorityCols.map(c=>`<option value="${c.id}"${card.columnId===c.id?' selected':''}>${c.label}</option>`).join('');
   const today=new Date().toISOString().slice(0,10);
+  const card=id?S.cards.find(c=>c.id===id):{columnId:defaultCol||'hoje',title:'',description:'',priority:'Média',tags:'',observations:'',dueDate:today};
+  editingCard=id;
   openModal(`
     <h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar Cartão':'Novo Cartão'}</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">O cartão será posicionado automaticamente pelo prazo: hoje → Fazer Hoje · até 7 dias → Durante a Semana · depois → Durante o Mês</p>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div><label>Título *</label><input id="mTitle" value="${esc(card.title)}" placeholder="Título"/></div>
       <div><label>Descrição</label><textarea id="mDesc">${esc(card.description||'')}</textarea></div>
-      <div><label>Coluna</label><select id="mCol">${colOpts}</select></div>
       <div><label>Prioridade</label><select id="mPri">${['Baixa','Média','Alta','Urgente'].map(p=>`<option${card.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
-      <div><label>Data de Prazo</label><input type="date" id="mDue" value="${card.dueDate?fmtDateInput(card.dueDate):today}"/></div>
+      <div><label>Data de Prazo *</label><input type="date" id="mDue" value="${card.dueDate?fmtDateInput(card.dueDate):today}"/></div>
       <div><label>Tags (vírgula)</label><input id="mTags" value="${esc(card.tags||'')}" placeholder="ex: safari, urgente"/></div>
       <div><label>Observações</label><textarea id="mObs">${esc(card.observations||'')}</textarea></div>
       <div style="display:flex;gap:9px;margin-top:4px">
@@ -453,7 +483,12 @@ function openCardModal(id,defaultCol){
 }
 function saveCard(){
   const title=document.getElementById('mTitle').value.trim();if(!title)return;
-  const d={id:editingCard,title,description:document.getElementById('mDesc').value,columnId:document.getElementById('mCol').value,priority:document.getElementById('mPri').value,tags:document.getElementById('mTags').value,observations:document.getElementById('mObs').value,dueDate:document.getElementById('mDue').value?new Date(document.getElementById('mDue').value).toISOString():''};
+  const dueRaw=document.getElementById('mDue').value;
+  const dueDate=dueRaw?new Date(dueRaw).toISOString():'';
+  const columnId=editingCard
+    ?(S.cards.find(c=>c.id===editingCard)||{}).columnId||colByDate(dueDate)
+    :colByDate(dueDate);
+  const d={id:editingCard,title,description:document.getElementById('mDesc').value,columnId,priority:document.getElementById('mPri').value,tags:document.getElementById('mTags').value,observations:document.getElementById('mObs').value,dueDate};
   if(editingCard){S.cards=S.cards.map(c=>c.id===editingCard?{...c,...d}:c);}
   else{S.cards.push({...d,id:uid(),createdAt:nowISO(),completedAt:null});}
   closeModal();render();
@@ -711,11 +746,28 @@ function openThemeModal(id){
       </div>
     </div>`);
 }
+function autoCreateCard(name,models){
+  // Remove existing "criar" cards for this theme
+  S.cards=S.cards.filter(c=>!(c.columnId==='criar'&&c.auto===true&&c.themeName&&c.themeName.toLowerCase()===name.toLowerCase()));
+  if(models<15){
+    const falta=15-models;
+    const dueDate=new Date(Date.now()+7*86400000).toISOString();
+    S.cards.push({
+      id:uid(),title:`Criar mais ${falta} modelo(s) de ${name}`,
+      description:`Tema com estoque ${models<=4?'insuficiente':'básico'} (${models} modelo(s)). Meta: 15 modelos.`,
+      columnId:'criar',priority:models<=4?'Alta':'Média',tags:'auto,biblioteca',
+      observations:'Criado automaticamente pela biblioteca.',
+      dueDate,createdAt:nowISO(),completedAt:null,auto:true,themeName:name
+    });
+  }
+}
 function saveTheme(){
   const name=document.getElementById('tName').value.trim();if(!name)return;
-  const d={name,models:parseInt(document.getElementById('tModels').value)||0,observations:document.getElementById('tObs').value};
+  const models=parseInt(document.getElementById('tModels').value)||0;
+  const d={name,models,observations:document.getElementById('tObs').value};
   if(editingTheme){S.themes=S.themes.map(t=>t.id===editingTheme?{...t,...d}:t);}
   else{S.themes.push({...d,id:uid(),createdAt:nowISO()});}
+  autoCreateCard(name,models);
   closeModal();renderLibrary();renderDashboard();
 }
 function deleteTheme(id){S.themes=S.themes.filter(x=>x.id!==id);renderLibrary();renderDashboard();}
