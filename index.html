@@ -10,17 +10,17 @@
 :root{--bg:#faf5ff;--card:#fff;--border:#e9d5ff;--text:#1e1b4b;--muted:#6b7280;--accent:#9333ea;--accent2:#db2777;--surface:#f3e8ff;}
 body.dark{--bg:#0f0f13;--card:#1a1a24;--border:#2a2a3a;--text:#f0f0ff;--muted:#888aaa;--accent:#c084fc;--accent2:#f472b6;--surface:#22222f;}
 body{background:var(--bg);color:var(--text);font-family:'Nunito','Segoe UI',sans-serif;min-height:100vh;transition:background .3s,color .3s;}
-::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px;opacity:.4;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px;opacity:.4;}
 .btn{cursor:pointer;border:none;border-radius:10px;padding:8px 16px;font-family:inherit;font-weight:700;font-size:13px;transition:all .2s;}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 15px #9333ea44;}
-.btn-primary:disabled{opacity:.5;transform:none;cursor:not-allowed;}
 .btn-sm{padding:5px 11px;font-size:12px;border-radius:8px;}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
 .btn-ghost:hover{background:var(--surface);color:var(--text);}
 .btn-icon{background:transparent;border:1px solid var(--border);border-radius:7px;padding:3px 9px;cursor:pointer;font-size:14px;font-weight:800;color:var(--text);transition:all .15s;}
 .btn-icon:hover{background:var(--surface);}
+.btn-suggest{background:var(--accent)15;color:var(--accent);border:1px solid var(--accent)44;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-suggest:hover{background:var(--accent);color:#fff;}
 input,textarea,select{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);padding:9px 13px;font-family:inherit;font-size:14px;width:100%;outline:none;transition:border-color .2s;}
 input:focus,textarea:focus,select:focus{border-color:var(--accent);}
 textarea{resize:vertical;min-height:70px;}
@@ -36,14 +36,11 @@ label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bot
 .fade-in{animation:fi .3s ease;}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px;}
-.ch{transition:all .2s;}
-.ch:hover{transform:translateY(-2px);box-shadow:0 8px 25px #9333ea22;}
-.grid-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px;margin-bottom:20px;}
+.ch{transition:all .2s;}.ch:hover{transform:translateY(-2px);box-shadow:0 8px 25px #9333ea22;}
+.grid-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.grid-themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
+.grid-themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
 .grid-ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
-.stat-card{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);border-left-width:4px;transition:all .2s;}
-.stat-card:hover{transform:translateY(-2px);}
 .kanban-wrap{display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:12px;}
 .kanban-col{min-width:260px;max-width:260px;background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;flex-shrink:0;}
 .kanban-col.drag-over{border:2px dashed var(--accent);background:var(--surface);}
@@ -51,31 +48,45 @@ label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bot
 .col-body{padding:9px;display:flex;flex-direction:column;gap:7px;min-height:80px;}
 .k-card{background:var(--surface);border-radius:10px;padding:11px;border:1px solid var(--border);border-left-width:4px;cursor:grab;transition:all .15s;}
 .k-card:hover{box-shadow:0 4px 12px #9333ea22;}
+.k-card.dragging{opacity:.4;transform:scale(.97);}
+.drop-indicator{height:4px;background:var(--accent);border-radius:4px;margin:2px 0;display:none;}
+.drop-indicator.active{display:block;}
 .tag{display:inline-block;border-radius:7px;padding:1px 7px;font-size:11px;font-weight:700;margin:1px;}
 .badge{border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;}
 .modal-overlay{position:fixed;inset:0;background:#0008;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;}
 .modal-box{background:var(--card);border-radius:18px;padding:26px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px #0007;border:1px solid var(--border);}
-.mini-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;}
-.mini-stat{background:var(--surface);border-radius:9px;padding:9px 5px;text-align:center;}
-.mini-stat-val{font-size:21px;font-weight:900;}
-.mini-stat-lbl{font-size:10px;color:var(--muted);font-weight:700;}
-.hist-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:center;}
-.orc-item{background:var(--card);border-radius:12px;padding:13px 15px;border:1px solid var(--border);border-left-width:4px;margin-bottom:9px;}
+/* Theme card compact */
+.theme-card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;transition:all .2s;}
+.theme-card:hover{transform:translateY(-1px);box-shadow:0 4px 15px #9333ea15;}
+.theme-stats{display:flex;gap:8px;margin:8px 0;}
+.theme-stat{flex:1;background:var(--surface);border-radius:8px;padding:6px 4px;text-align:center;}
+.theme-stat-val{font-size:18px;font-weight:900;}
+.theme-stat-lbl{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.status-badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;border:1px solid transparent;}
+/* Autocomplete */
+.ac-wrap{position:relative;}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--accent);border-radius:10px;z-index:50;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px #0002;margin-top:2px;}
+.ac-item{padding:9px 13px;cursor:pointer;font-size:14px;transition:background .15s;}
+.ac-item:hover,.ac-item.selected{background:var(--surface);}
+/* Month history */
 .month-group{background:var(--card);border-radius:12px;border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
 .month-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;background:var(--surface);}
 .month-header:hover{background:var(--border);}
-.month-body{padding:0 16px;}
 .theme-group{border-bottom:1px solid var(--border);}
 .theme-row{padding:9px 0;display:flex;align-items:center;gap:8px;cursor:pointer;}
 .theme-dates{padding:4px 0 8px 20px;}
-.search-box{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 13px;font-family:inherit;font-size:14px;width:100%;outline:none;margin-bottom:16px;}
-.search-box:focus{border-color:var(--accent);}
+.hist-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;align-items:center;}
+.orc-item{background:var(--card);border-radius:12px;padding:13px 15px;border:1px solid var(--border);border-left-width:4px;margin-bottom:9px;}
 .footer{background:var(--card);border-top:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px;}
+.search-input{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 13px 9px 38px;font-family:inherit;font-size:14px;width:100%;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:var(--accent);}
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;}
 @media(max-width:700px){.grid-2{grid-template-columns:1fr;}.verse-box{display:none;}.modal-box{padding:18px;}}
+.hidden{display:none!important;}
 </style>
 </head>
 <body>
-
 <div class="header">
   <div style="position:relative;cursor:pointer" onclick="document.getElementById('logoUpload').click()" title="Clique para trocar a logo">
     <img id="logoImg" src="" alt="" style="width:42px;height:42px;border-radius:10px;object-fit:cover;display:none;border:2px solid var(--border)"/>
@@ -117,13 +128,11 @@ label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bot
 </div>
 
 <div class="footer">
-  <button class="btn btn-ghost btn-sm" onclick="exportData()" style="font-size:13px">💾 Exportar Dados</button>
-  <label class="btn btn-ghost btn-sm" style="cursor:pointer;font-size:13px">📂 Importar Dados<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
+  <button class="btn btn-ghost btn-sm" onclick="exportData()" style="font-size:13px">💾 Exportar</button>
+  <label class="btn btn-ghost btn-sm" style="cursor:pointer;font-size:13px">📂 Importar<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
   <span style="color:var(--border)">|</span>
   <span style="font-size:12px;color:var(--muted)">Convites Studio · Gestão Inteligente</span>
 </div>
-
-<style>.hidden{display:none!important;}</style>
 
 <script>
 // ═══ VERSES ═══
@@ -139,22 +148,20 @@ const VERSES=[
   {text:"Com Deus tudo é possível.",ref:"Mateus 19:26"},
   {text:"O Senhor te abençoe e te guarde.",ref:"Números 6:24"},
   {text:"Alegrai-vos sempre no Senhor; outra vez digo, alegrai-vos.",ref:"Filipenses 4:4"},
-  {text:"A fé é a certeza daquilo que esperamos.",ref:"Hebreus 11:1"},
-  {text:"Não te deixes vencer pelo mal, mas vence o mal com o bem.",ref:"Romanos 12:21"},
   {text:"Confia no Senhor de todo o teu coração.",ref:"Provérbios 3:5"},
   {text:"Aquele que começou boa obra em você a completará.",ref:"Filipenses 1:6"},
   {text:"Vinde a mim todos os que estão cansados e eu vos aliviarei.",ref:"Mateus 11:28"},
   {text:"O Senhor é a minha luz e a minha salvação.",ref:"Salmos 27:1"},
-  {text:"Deus é refúgio e fortaleza, auxílio sempre presente.",ref:"Salmos 46:1"},
-  {text:"Não andem ansiosos, mas em tudo apresentem seus pedidos a Deus.",ref:"Filipenses 4:6"},
   {text:"Não temas, porque eu sou contigo.",ref:"Isaías 41:10"},
   {text:"Ele dá força ao cansado e vigor ao que não tem forças.",ref:"Isaías 40:29"},
   {text:"Grandes coisas fez o Senhor por nós, e por isso estamos alegres.",ref:"Salmos 126:3"},
   {text:"Deus é amor, e quem permanece no amor permanece em Deus.",ref:"1 João 4:16"},
   {text:"O Senhor te guardará de todo o mal.",ref:"Salmos 121:7"},
+  {text:"A fé é a certeza daquilo que esperamos.",ref:"Hebreus 11:1"},
+  {text:"Não te deixes vencer pelo mal, mas vence o mal com o bem.",ref:"Romanos 12:21"},
+  {text:"Sou o caminho, a verdade e a vida.",ref:"João 14:6"},
+  {text:"Deus é refúgio e fortaleza, auxílio sempre presente.",ref:"Salmos 46:1"},
 ];
-
-// ═══ HELPERS ═══
 const uid=()=>Math.random().toString(36).slice(2,10);
 const nowISO=()=>new Date().toISOString();
 const fmtDate=iso=>iso?new Date(iso).toLocaleDateString('pt-BR'):'—';
@@ -170,29 +177,21 @@ const defaultColumns=[
   {id:'mes',title:'🗓️ Durante o Mês',color:'#a855f7'},
   {id:'andamento',title:'⚙️ Em Andamento',color:'#06b6d4'},
   {id:'criar',title:'🎨 Convites para Criar',color:'#ec4899'},
-  {id:'melhorias',title:'📈 Melhorias do Negócio',color:'#14b8a6'},
+  {id:'melhorias',title:'📈 Melhorias',color:'#14b8a6'},
   {id:'concluido',title:'✅ Concluído',color:'#22c55e'},
 ];
-let S={
-  columns:[...defaultColumns],
-  cards:[],ideas:[],convitesDodia:[],orcamentos:[],themes:[],
-  dark:false,tab:'dashboard'
-};
-let dragCardId=null,dragColId=null,editingCard=null,editingIdea=null,editingTheme=null;
-// track expanded months/themes
+let S={columns:[...defaultColumns],cards:[],ideas:[],convitesDodia:[],orcamentos:[],themes:[],dark:false,tab:'dashboard'};
+let dragCardId=null,dragColId=null,dragOverCardId=null;
+let editingCard=null,editingIdea=null,editingTheme=null;
 let expandedMonths={},expandedThemes={};
+let showAllAnalise=false;
 
-// ═══ DARK / VERSE ═══
+// ═══ DARK/VERSE ═══
 function toggleDark(){S.dark=!S.dark;document.body.classList.toggle('dark',S.dark);document.getElementById('darkBtn').textContent=S.dark?'☀️':'🌙';render();}
 function setVerse(){const v=VERSES[new Date().getDate()%VERSES.length];document.getElementById('verseText').textContent=`"${v.text}" `;document.getElementById('verseRef').textContent=v.ref;}
 
 // ═══ TABS ═══
-function switchTab(t){
-  S.tab=t;
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
-  document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.toggle('hidden',p.id!=='page-'+t));
-  render();
-}
+function switchTab(t){S.tab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.toggle('hidden',p.id!=='page-'+t));render();}
 document.getElementById('tabs').addEventListener('click',e=>{if(e.target.dataset.tab)switchTab(e.target.dataset.tab);});
 
 // ═══ MODAL ═══
@@ -211,40 +210,32 @@ function render(){
   else if(t==='busca')renderBusca();
 }
 
-// ═══ THEME ANALYSIS ═══
+// ═══ THEME INSIGHT ═══
 function themeInsight(models,orc,prodMes){
   const orcInfo=orc>0?` · ${orc} orçamento(s)`:'';
   const prodInfo=prodMes>0?` · ${prodMes} produzido(s) este mês`:'';
-  // Priority for Análise do Mês
-  let priority='Baixa';
-  if(models<=4||(models<=14&&orc>=3))priority='Alta';
-  else if(models<=14||(models<=29&&orc>=5))priority='Média';
-
-  if(models===0){
-    return{text:'Nenhum modelo cadastrado. Crie modelos para este tema!',cor:'#ef4444',status:'Estoque Insuficiente',priority:'Alta'};
-  }
-  if(models<=4){
-    const falta=15-models;
-    return{text:`Estoque insuficiente (${models} modelo(s)). Crie mais ${falta} modelos para variedade mínima${orcInfo}${prodInfo}.`,cor:'#ef4444',status:'Estoque Insuficiente',priority:'Alta'};
-  }
-  if(models<=14){
-    const falta=15-models;
-    return{text:`Estoque básico (${models} modelo(s)). Crie mais ${falta} modelo(s) para atingir o mínimo recomendado${orcInfo}${prodInfo}.`,cor:'#f97316',status:'Estoque Básico',priority};
-  }
-  if(models<=29){
-    return{text:`Bem abastecida (${models} modelo(s)). Cliente encontra variedade sem buscar fora${orcInfo}${prodInfo}.`,cor:'#22c55e',status:'Bem Abastecida',priority:'Baixa'};
-  }
-  return{text:`Biblioteca ampla (${models} modelo(s)). Excelente variedade! Não é prioridade criar mais${orcInfo}${prodInfo}.`,cor:'#3b82f6',status:'Biblioteca Ampla',priority:'Baixa'};
+  let priority=models<=4?'Alta':models<=14?'Média':'Baixa';
+  if(models<=4&&orc>=3)priority='Alta';
+  if(models===0)return{text:'Nenhum modelo cadastrado.',cor:'#ef4444',status:'Sem Modelos',priority:'Alta',emoji:'🔴'};
+  if(models<=4){const f=15-models;return{text:`Crie mais ${f} modelos para variedade mínima${orcInfo}${prodInfo}.`,cor:'#ef4444',status:'Insuficiente',priority,emoji:'🔴'};}
+  if(models<=14){const f=15-models;return{text:`Crie mais ${f} modelos para atingir o mínimo recomendado${orcInfo}${prodInfo}.`,cor:'#f97316',status:'Básico',priority,emoji:'🟠'};}
+  if(models<=29)return{text:`Cliente encontra variedade sem buscar fora${orcInfo}${prodInfo}.`,cor:'#22c55e',status:'Bem Abastecida',priority:'Baixa',emoji:'🟢'};
+  return{text:`Excelente variedade! Não é prioridade criar mais${orcInfo}${prodInfo}.`,cor:'#3b82f6',status:'Ampla',priority:'Baixa',emoji:'🔵'};
 }
 
-// ═══ STATS HELPERS ═══
 function getOrcCount(theme){const o=S.orcamentos.find(x=>x.theme.toLowerCase()===theme.toLowerCase());return o?o.count:0;}
-function getMonthProd(theme){
-  const now=new Date(),m=now.getMonth(),y=now.getFullYear();
-  return S.convitesDodia.filter(p=>{const d=new Date(p.date);return d.getMonth()===m&&d.getFullYear()===y&&p.theme.toLowerCase()===theme.toLowerCase();}).reduce((a,p)=>a+Number(p.qty),0);
-}
+function getMonthProd(theme){const now=new Date(),m=now.getMonth(),y=now.getFullYear();return S.convitesDodia.filter(p=>{const d=new Date(p.date);return d.getMonth()===m&&d.getFullYear()===y&&p.theme.toLowerCase()===theme.toLowerCase();}).reduce((a,p)=>a+Number(p.qty),0);}
 function getTotalProd(theme){return S.convitesDodia.filter(p=>p.theme.toLowerCase()===theme.toLowerCase()).reduce((a,p)=>a+Number(p.qty),0);}
 function pColor(p){return{Baixa:'#22c55e',Média:'#eab308',Alta:'#f97316',Urgente:'#ef4444'}[p]||'#94a3b8';}
+function colByDate(d){if(!d)return'hoje';const days=diffDays(nowISO(),d);if(days<=0)return'hoje';if(days<=7)return'semana';return'mes';}
+
+// ═══ AUTOCOMPLETE HELPERS ═══
+function allThemeNames(){
+  const fromLib=S.themes.map(t=>t.name);
+  const fromOrc=S.orcamentos.map(o=>o.theme);
+  const fromProd=S.convitesDodia.map(p=>p.theme);
+  return [...new Set([...fromLib,...fromOrc,...fromProd])].sort();
+}
 
 // ═══ DASHBOARD ═══
 function renderDashboard(){
@@ -258,78 +249,49 @@ function renderDashboard(){
 
   // alerts
   const overdue=S.cards.filter(c=>c.columnId!=='concluido'&&c.dueDate&&diffDays(c.dueDate,nowISO())>0);
-  const lowStock=S.themes.filter(t=>Number(t.models)<15);
+  const urgent=S.themes.filter(t=>{const m=Number(t.models||0);const o=getOrcCount(t.name);return o>0&&m<15;});
   let alertsHtml='';
-  if(overdue.length>0){
-    alertsHtml+=`<div style="background:#ef444415;border:1.5px solid #ef444444;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:4px solid #ef4444">
-      <div style="font-weight:800;color:#ef4444;margin-bottom:8px">⚠️ ${overdue.length} tarefa(s) atrasada(s)</div>
-      ${overdue.map(c=>`<div style="font-size:13px;padding:3px 0;display:flex;gap:8px"><span style="flex:1;font-weight:600">${esc(c.title)}</span><span style="color:#ef4444;font-size:12px">venceu ${fmtDate(c.dueDate)}</span></div>`).join('')}
-    </div>`;
-  }
-  if(lowStock.length>0){
-    alertsHtml+=`<div style="background:#f9731615;border:1.5px solid #f9731644;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:4px solid #f97316">
-      <div style="font-weight:800;color:#f97316;margin-bottom:8px">🎨 Temas com poucos modelos (menos de 15)</div>
-      ${lowStock.map(t=>`<div style="font-size:13px;padding:3px 0;display:flex;gap:8px"><span style="flex:1;font-weight:600">${esc(t.name)}</span><span style="color:#f97316;font-size:12px">${t.models} modelos</span></div>`).join('')}
-    </div>`;
-  }
+  if(overdue.length>0){alertsHtml+=`<div style="background:#ef444415;border:1.5px solid #ef444444;border-radius:12px;padding:12px 16px;margin-bottom:10px;border-left:4px solid #ef4444"><div style="font-weight:800;color:#ef4444;margin-bottom:6px">⚠️ ${overdue.length} tarefa(s) atrasada(s)</div>${overdue.map(c=>`<div style="font-size:13px;display:flex;gap:8px"><span style="flex:1">${esc(c.title)}</span><span style="color:#ef4444;font-size:12px">venceu ${fmtDate(c.dueDate)}</span></div>`).join('')}</div>`;}
+  if(urgent.length>0){alertsHtml+=`<div style="background:#f9731615;border:1.5px solid #f9731644;border-radius:12px;padding:12px 16px;margin-bottom:10px;border-left:4px solid #f97316"><div style="font-weight:800;color:#f97316;margin-bottom:6px">🎨 Temas com orçamentos e poucos modelos</div>${urgent.map(t=>`<div style="font-size:13px;display:flex;gap:8px"><span style="flex:1">${esc(t.name)}</span><span style="color:#f97316;font-size:12px">${t.models} modelos · ${getOrcCount(t.name)} orçamentos</span></div>`).join('')}</div>`;}
 
-  // analise mes
+  // analise mes — only show themes with activity or low stock + orders
   const now=new Date(),mes=now.toLocaleString('pt-BR',{month:'long',year:'numeric'});
-  let analiseMes='';
-  // Sort by priority: Alta first
-  const themesSorted=[...S.themes].sort((a,b)=>{
-    const pa=themeInsight(Number(a.models||0),getOrcCount(a.name),getMonthProd(a.name)).priority;
-    const pb=themeInsight(Number(b.models||0),getOrcCount(b.name),getMonthProd(b.name)).priority;
-    return{Alta:0,Média:1,Baixa:2}[pa]-{Alta:0,Média:1,Baixa:2}[pb];
-  });
-  themesSorted.forEach(t=>{
-    const orc=getOrcCount(t.name),prodMes=getMonthProd(t.name),models=Number(t.models||0);
-    if(orc===0&&prodMes===0&&models>=15)return;
-    const insight=themeInsight(models,orc,prodMes);
-    const precisa=models<15?15-models:models<30&&orc>=5?30-models:0;
-    const priColor={Alta:'#ef4444',Média:'#f97316',Baixa:'#22c55e'}[insight.priority];
-    analiseMes+=`<div style="background:${insight.cor}10;border-left:4px solid ${insight.cor};border-radius:10px;padding:12px;margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-        <strong style="color:${insight.cor};font-size:14px">🎨 ${esc(t.name)}</strong>
-        <span style="background:${priColor}22;color:${priColor};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:800">Prioridade ${insight.priority}</span>
-        <span style="background:${insight.cor}22;color:${insight.cor};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">${insight.status}</span>
-        ${precisa>0?`<span style="margin-left:auto;background:#ef444422;color:#ef4444;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">+${precisa} necessários</span>`:''}
-      </div>
-      <p style="font-size:13px;line-height:1.7">${insight.text}</p>
+  const activeThemes=S.themes.filter(t=>{const o=getOrcCount(t.name),pm=getMonthProd(t.name),m=Number(t.models||0);return o>0||pm>0||(m<15&&o>0);});
+  const sorted=[...activeThemes].sort((a,b)=>{const pa=themeInsight(Number(a.models||0),getOrcCount(a.name),getMonthProd(a.name)).priority;const pb=themeInsight(Number(b.models||0),getOrcCount(b.name),getMonthProd(b.name)).priority;return{Alta:0,Média:1,Baixa:2}[pa]-{Alta:0,Média:1,Baixa:2}[pb];});
+  const highMed=sorted.filter(t=>['Alta','Média'].includes(themeInsight(Number(t.models||0),getOrcCount(t.name),getMonthProd(t.name)).priority));
+  const low=sorted.filter(t=>themeInsight(Number(t.models||0),getOrcCount(t.name),getMonthProd(t.name)).priority==='Baixa');
+  
+  const renderAnaliseItem=t=>{
+    const m=Number(t.models||0),o=getOrcCount(t.name),pm=getMonthProd(t.name);
+    const ins=themeInsight(m,o,pm);
+    const priColor={Alta:'#ef4444',Média:'#f97316',Baixa:'#22c55e'}[ins.priority];
+    const precisa=m<15?15-m:0;
+    return `<div style="background:${ins.cor}08;border-left:4px solid ${ins.cor};border-radius:10px;padding:11px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:16px">${ins.emoji}</span>
+      <strong style="color:${ins.cor};font-size:13px">${esc(t.name)}</strong>
+      <span style="background:${priColor}22;color:${priColor};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800">▲ ${ins.priority}</span>
+      <span style="background:${ins.cor}22;color:${ins.cor};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">${ins.status}</span>
+      ${precisa>0?`<span style="background:#ef444422;color:#ef4444;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">+${precisa} necessários</span>`:''}
+      <span style="flex:1;font-size:12px;color:var(--muted);min-width:180px">${ins.text}</span>
     </div>`;
-  });
+  };
 
   document.getElementById('page-dashboard').innerHTML=`
     <h2 style="font-family:'Playfair Display',serif;font-size:26px;margin-bottom:18px">Painel Principal ✨</h2>
     <div class="grid-stats">
-      ${[
-        {label:'Tarefas Abertas',value:open,emoji:'📋',color:'#3b82f6'},
-        {label:'Concluídas',value:done,emoji:'✅',color:'#22c55e'},
-        {label:'Ideias',value:S.ideas.length,emoji:'💡',color:'#eab308'},
-        {label:'Orçamentos',value:S.orcamentos.length,emoji:'💬',color:'#ec4899'},
-        {label:'Semana',value:week,emoji:'⚡',color:'#f97316'},
-        {label:'Mês',value:month,emoji:'📈',color:'#a855f7'},
-        {label:'Temas',value:S.themes.length,emoji:'🎨',color:'#14b8a6'},
-      ].map(s=>`<div class="stat-card ch" style="border-left-color:${s.color}">
-        <div style="font-size:22px;margin-bottom:4px">${s.emoji}</div>
-        <div style="font-size:26px;font-weight:900;color:${s.color}">${s.value}</div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600">${s.label}</div>
-      </div>`).join('')}
+      ${[{label:'Tarefas',value:open,emoji:'📋',color:'#3b82f6'},{label:'Concluídas',value:done,emoji:'✅',color:'#22c55e'},{label:'Ideias',value:S.ideas.length,emoji:'💡',color:'#eab308'},{label:'Orçamentos',value:S.orcamentos.length,emoji:'💬',color:'#ec4899'},{label:'Semana',value:week,emoji:'⚡',color:'#f97316'},{label:'Mês',value:month,emoji:'📈',color:'#a855f7'},{label:'Temas',value:S.themes.length,emoji:'🎨',color:'#14b8a6'}].map(s=>`<div class="card ch" style="border-left:4px solid ${s.color};padding:14px"><div style="font-size:20px;margin-bottom:4px">${s.emoji}</div><div style="font-size:26px;font-weight:900;color:${s.color}">${s.value}</div><div style="font-size:11px;color:var(--muted);font-weight:600">${s.label}</div></div>`).join('')}
     </div>
     ${alertsHtml}
     <div class="grid-2" style="margin-bottom:16px">
-      <div class="card">
-        <h3 style="font-weight:800;margin-bottom:12px;color:var(--accent)">🏆 Mais Produzidos</h3>
-        ${topProd.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados ainda</p>':topProd.map(([t,n],i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-weight:900;color:var(--accent);width:22px">${i+1}º</span><span style="flex:1;font-weight:600">${esc(t)}</span><span class="badge" style="background:var(--surface)">${n}</span></div>`).join('')}
-      </div>
-      <div class="card">
-        <h3 style="font-weight:800;margin-bottom:12px;color:var(--accent2)">💬 Mais Orçamentos</h3>
-        ${topOrc.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados ainda</p>':topOrc.map((o,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-weight:900;color:var(--accent2);width:22px">${i+1}º</span><span style="flex:1;font-weight:600">${esc(o.theme)}</span><span class="badge" style="background:#ec489922;color:#ec4899">${o.count}x</span></div>`).join('')}
-      </div>
+      <div class="card"><h3 style="font-weight:800;margin-bottom:12px;color:var(--accent)">🏆 Mais Produzidos</h3>${topProd.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados</p>':topProd.map(([t,n],i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-weight:900;color:var(--accent);width:22px">${i+1}º</span><span style="flex:1;font-weight:600">${esc(t)}</span><span class="badge" style="background:var(--surface)">${n}</span></div>`).join('')}</div>
+      <div class="card"><h3 style="font-weight:800;margin-bottom:12px;color:var(--accent2)">💬 Mais Orçamentos</h3>${topOrc.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados</p>':topOrc.map((o,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-weight:900;color:var(--accent2);width:22px">${i+1}º</span><span style="flex:1;font-weight:600">${esc(o.theme)}</span><span class="badge" style="background:#ec489922;color:#ec4899">${o.count}x</span></div>`).join('')}</div>
     </div>
     <div class="card">
-      <h3 style="font-weight:800;margin-bottom:14px;font-size:16px">📊 Análise do Mês — ${mes}</h3>
-      ${analiseMes||'<p style="color:var(--muted);font-size:13px">Cadastre temas e registre orçamentos para ver a análise.</p>'}
+      <h3 style="font-weight:800;margin-bottom:12px;font-size:15px">📊 Análise do Mês — ${mes}</h3>
+      ${highMed.length===0&&low.length===0?'<p style="color:var(--muted);font-size:13px">Registre orçamentos e produções para ver a análise.</p>':''}
+      ${highMed.map(renderAnaliseItem).join('')}
+      ${low.length>0?`<div id="lowAnalise" class="${showAllAnalise?'':'hidden'}">${low.map(renderAnaliseItem).join('')}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:12px" onclick="showAllAnalise=!showAllAnalise;renderDashboard()">${showAllAnalise?'▲ Ver menos':'▼ Ver temas bem abastecidos ('+low.length+')'}</button>`:''}
     </div>`;
 }
 
@@ -340,60 +302,48 @@ function renderKanban(){
       <h2 style="font-family:'Playfair Display',serif;font-size:26px">Quadro de Tarefas 📋</h2>
       <button class="btn btn-primary btn-sm" onclick="addColumn()">+ Coluna</button>
     </div>
-    <div class="kanban-wrap" id="kanbanWrap">
-      ${S.columns.map(col=>{
-        const cards=S.cards.filter(c=>c.columnId===col.id);
-        return `<div class="kanban-col" id="col-${col.id}" draggable="true"
-          ondragstart="colDragStart('${col.id}')"
-          ondragover="event.preventDefault();document.getElementById('col-${col.id}').classList.add('drag-over')"
-          ondrop="colDrop('${col.id}')"
-          ondragleave="document.getElementById('col-${col.id}').classList.remove('drag-over')">
-          <div class="col-header" style="border-bottom:3px solid ${col.color}">
-            <span style="flex:1;font-weight:800;font-size:13px">${col.title}</span>
-            <span class="badge" style="background:${col.color}33;color:${col.color}">${cards.length}</span>
-            <button class="btn btn-ghost btn-sm" style="padding:2px 6px" onclick="renameCol('${col.id}')">✏️</button>
-            <button class="btn btn-ghost btn-sm" style="padding:2px 6px;color:#ef4444" onclick="deleteCol('${col.id}')">🗑️</button>
-          </div>
-          <div class="col-body" id="body-${col.id}"
-            ondragover="event.preventDefault()"
-            ondrop="cardDrop('${col.id}')">
-            ${cards.map(card=>renderCard(card,col)).join('')}
-            <button class="btn btn-ghost btn-sm" style="width:100%;border-style:dashed" onclick="openCardModal(null,'${col.id}')">+ Cartão</button>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
+    <div class="kanban-wrap">${S.columns.map(col=>{
+      const cards=S.cards.filter(c=>c.columnId===col.id);
+      return `<div class="kanban-col" id="col-${col.id}">
+        <div class="col-header" style="border-bottom:3px solid ${col.color}">
+          <span style="flex:1;font-weight:800;font-size:13px">${col.title}</span>
+          <span class="badge" style="background:${col.color}33;color:${col.color}">${cards.length}</span>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 6px" onclick="renameCol('${col.id}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 6px;color:#ef4444" onclick="deleteCol('${col.id}')">🗑️</button>
+        </div>
+        <div class="col-body" id="body-${col.id}"
+          ondragover="onColDragOver(event,'${col.id}')"
+          ondrop="onColDrop(event,'${col.id}')"
+          ondragleave="onColDragLeave(event,'${col.id}')">
+          ${cards.map(card=>renderCard(card,col)).join('')}
+          <button class="btn btn-ghost btn-sm" style="width:100%;border-style:dashed;margin-top:4px" onclick="openCardModal(null,'${col.id}')">+ Cartão</button>
+        </div>
+      </div>`;
+    }).join('')}</div>
   </div>`;
 }
 
 function renderCard(card,col){
   const pc=pColor(card.priority);
   const tags=card.tags?card.tags.split(',').map(t=>`<span class="tag" style="background:var(--border)">${t.trim()}</span>`).join(''):'';
-  const daysOld=col.id!=='concluido'?diffDays(card.createdAt,nowISO()):0;
-  const overdue=daysOld>=1;
-
-  // due date warning
   let dueWarn='';
   if(card.dueDate&&col.id!=='concluido'){
     const daysLeft=diffDays(nowISO(),card.dueDate);
     if(daysLeft<0)dueWarn=`<div style="font-size:11px;color:#ef4444;background:#ef444415;padding:3px 8px;border-radius:6px;margin-bottom:5px;font-weight:700">⚠️ Atrasada ${Math.abs(daysLeft)} dia(s)</div>`;
-    else if(daysLeft<=2)dueWarn=`<div style="font-size:11px;color:#eab308;background:#eab30815;padding:3px 8px;border-radius:6px;margin-bottom:5px;font-weight:700">⏰ Vence em ${daysLeft===0?'hoje':daysLeft+' dia(s)'}</div>`;
+    else if(daysLeft<=2)dueWarn=`<div style="font-size:11px;color:#eab308;background:#eab30815;padding:3px 8px;border-radius:6px;margin-bottom:5px;font-weight:700">⏰ Vence ${daysLeft===0?'hoje':'em '+daysLeft+' dia(s)'}</div>`;
   }
-
   const completed=col.id==='concluido'&&card.completedAt?`<div style="font-size:11px;color:#22c55e;margin-top:5px">✅ ${fmtDate(card.completedAt)} · ${diffDays(card.createdAt,card.completedAt)} dias</div>`:'';
   const completeBtn=col.id!=='concluido'?`<button class="btn btn-primary btn-sm" style="flex:1" onclick="completeCard('${card.id}','${col.id}')">✅ Concluir</button>`:'';
-
-  return `<div class="k-card" id="kcard-${card.id}" draggable="true"
-    style="border-left-color:${dueWarn.includes('Atrasada')?'#ef4444':dueWarn.includes('Vence')?'#eab308':pc}"
-    ondragstart="cardDragStart('${card.id}')">
+  const borderColor=dueWarn.includes('Atrasada')?'#ef4444':dueWarn.includes('Vence')?'#eab308':pc;
+  // column selector — all columns except current
+  const colOptions=S.columns.map(c=>`<option value="${c.id}"${c.id===col.id?' selected':''}>${c.title}</option>`).join('');
+  return `<div class="k-card" id="kcard-${card.id}" style="border-left-color:${borderColor}">
     <div style="font-weight:700;font-size:13px;margin-bottom:3px">${esc(card.title)}</div>
     ${card.description?`<div style="font-size:12px;color:var(--muted);margin-bottom:5px">${esc(card.description)}</div>`:''}
     ${dueWarn}
-    <div style="margin-bottom:5px">
-      ${card.priority?`<span class="tag" style="background:${pc}22;color:${pc}">${card.priority}</span>`:''}
-      ${tags}
-    </div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:7px">📅 Criado: ${fmtDate(card.createdAt)}${card.dueDate?` · Prazo: ${fmtDate(card.dueDate)}`:''}</div>
+    <div style="margin-bottom:5px">${card.priority?`<span class="tag" style="background:${pc}22;color:${pc}">${card.priority}</span>`:''} ${tags}</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:7px">📅 ${fmtDate(card.createdAt)}${card.dueDate?` · Prazo: ${fmtDate(card.dueDate)}`:''}</div>
+    <select style="width:100%;margin-bottom:7px;font-size:12px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;cursor:pointer" onchange="moveCard('${card.id}',this.value)">${colOptions}</select>
     <div style="display:flex;gap:5px">
       ${completeBtn}
       <button class="btn btn-ghost btn-sm" onclick="openCardModal('${card.id}')">✏️</button>
@@ -403,20 +353,89 @@ function renderCard(card,col){
   </div>`;
 }
 
-function cardDragStart(id){dragCardId=id;}
-function colDragStart(id){dragColId=id;}
-function cardDrop(colId){
-  if(!dragCardId)return;
-  S.cards=S.cards.map(c=>c.id===dragCardId?{...c,columnId:colId}:c);
-  dragCardId=null;renderKanban();
+// ─── DRAG & DROP ─────────────────────────────────────────────
+function clearDragLines(){document.querySelectorAll('.drag-line').forEach(l=>l.remove());}
+
+function cardDragStart(e,id){
+  dragCardId=id;
+  dragOverCardId=null;
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',id);
+  setTimeout(()=>{
+    const el=document.getElementById('kcard-'+id);
+    if(el){el.style.opacity='0.25';el.style.pointerEvents='none';}
+  },0);
 }
-function colDrop(colId){
-  if(dragCardId){cardDrop(colId);return;}
-  if(!dragColId||dragColId===colId){dragColId=null;return;}
-  const cols=[...S.columns];
-  const from=cols.findIndex(c=>c.id===dragColId),to=cols.findIndex(c=>c.id===colId);
-  const[moved]=cols.splice(from,1);cols.splice(to,0,moved);
-  S.columns=cols;dragColId=null;renderKanban();
+
+function onColDragOver(e,colId){
+  e.preventDefault();
+  if(!dragCardId)return;
+  const body=document.getElementById('body-'+colId);
+  if(!body)return;
+  clearDragLines();
+  // get all cards EXCEPT the one being dragged
+  const allCards=[...body.querySelectorAll('.k-card')].filter(c=>c.id!=='kcard-'+dragCardId);
+  let before=null;
+  for(const card of allCards){
+    const r=card.getBoundingClientRect();
+    if(e.clientY<r.top+r.height/2){before=card;break;}
+  }
+  // draw indicator line
+  const line=document.createElement('div');
+  line.className='drag-line';
+  line.style.cssText='height:4px;background:#9333ea;border-radius:4px;margin:3px 0;box-shadow:0 0 10px #9333ea99;pointer-events:none;';
+  if(before){
+    body.insertBefore(line,before);
+    dragOverCardId=before.id.replace('kcard-','');
+  } else {
+    const addBtn=body.querySelector('button');
+    if(addBtn) body.insertBefore(line,addBtn);
+    else body.appendChild(line);
+    dragOverCardId=null;
+  }
+}
+
+function onColDragLeave(e,colId){
+  const body=document.getElementById('body-'+colId);
+  if(body&&!body.contains(e.relatedTarget)) clearDragLines();
+}
+
+function onColDrop(e,colId){
+  e.preventDefault();
+  clearDragLines();
+  if(!dragCardId) return;
+  // restore opacity
+  const el=document.getElementById('kcard-'+dragCardId);
+  if(el){el.style.opacity='1';el.style.pointerEvents='';}
+  // insert card at correct position
+  if(dragOverCardId && dragOverCardId!==dragCardId){
+    const arr=[...S.cards];
+    const fi=arr.findIndex(c=>c.id===dragCardId);
+    const[moved]=arr.splice(fi,1);
+    moved.columnId=colId;
+    const ti=arr.findIndex(c=>c.id===dragOverCardId);
+    arr.splice(ti,0,moved);
+    S.cards=arr;
+  } else {
+    S.cards=S.cards.map(c=>c.id===dragCardId?{...c,columnId:colId}:c);
+  }
+  dragCardId=null;
+  dragOverCardId=null;
+  renderKanban();
+  renderDashboard();
+}
+
+// stubs to prevent crashes from old references
+function cardDragOver(){}
+function cardDragLeave(){}
+function cardDrop(){}
+function colDragStart(){}
+function colDragLeave(){}
+function colDrop(e,colId){onColDrop(e,colId);}
+
+function moveCard(id,colId){
+  S.cards=S.cards.map(c=>c.id===id?{...c,columnId:colId}:c);
+  renderKanban();renderDashboard();
 }
 function addColumn(){const t=prompt('Nome da nova coluna:');if(t){S.columns.push({id:uid(),title:t,color:'#6366f1'});renderKanban();}}
 function renameCol(id){const col=S.columns.find(c=>c.id===id);const t=prompt('Novo nome:',col?.title);if(t){S.columns=S.columns.map(c=>c.id===id?{...c,title:t}:c);renderKanban();}}
@@ -424,56 +443,24 @@ function deleteCol(id){if(confirm('Excluir coluna?')){S.columns=S.columns.filter
 function completeCard(id,colId){
   const card=S.cards.find(c=>c.id===id);
   S.cards=S.cards.map(c=>c.id===id?{...c,columnId:'concluido',completedAt:nowISO()}:c);
-  if(card&&(colId==='criar'||card.columnId==='criar')){
-    // auto card from library
-    if(card.auto&&card.themeName){
-      const match=card.title.match(/(\d+)/);
-      if(match){
-        const qty=parseInt(match[1]);
-        const existing=S.themes.find(t=>t.name.toLowerCase()===card.themeName.toLowerCase());
-        if(existing){
-          const newModels=Number(existing.models)+qty;
-          S.themes=S.themes.map(t=>t.id===existing.id?{...t,models:newModels}:t);
-          autoCreateCard(card.themeName,newModels);
-        }
-      }
-    } else {
-      const match=card.title.match(/(\d+)\s+modelo[s]?\s+de\s+(.+)/i);
-      if(match){
-        const qty=parseInt(match[1]),themeName=match[2].trim();
-        const existing=S.themes.find(t=>t.name.toLowerCase()===themeName.toLowerCase());
-        if(existing){
-          const newModels=Number(existing.models)+qty;
-          S.themes=S.themes.map(t=>t.id===existing.id?{...t,models:newModels}:t);
-          autoCreateCard(themeName,newModels);
-        }
-      }
-    }
-  }
   renderKanban();
 }
 function deleteCard(id){S.cards=S.cards.filter(c=>c.id!==id);render();}
 
-function colByDate(dueDate){
-  if(!dueDate)return'hoje';
-  const days=diffDays(nowISO(),dueDate);
-  if(days<=0)return'hoje';
-  if(days<=7)return'semana';
-  return'mes';
-}
 function openCardModal(id,defaultCol){
   const today=new Date().toISOString().slice(0,10);
   const card=id?S.cards.find(c=>c.id===id):{columnId:defaultCol||'hoje',title:'',description:'',priority:'Média',tags:'',observations:'',dueDate:today};
   editingCard=id;
-  openModal(`
-    <h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar Cartão':'Novo Cartão'}</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">O cartão será posicionado automaticamente pelo prazo: hoje → Fazer Hoje · até 7 dias → Durante a Semana · depois → Durante o Mês</p>
+  // store defaultCol for saveCard
+  openCardModal._defaultCol=defaultCol||null;
+  openModal(`<h3 style="font-weight:800;margin-bottom:6px;font-size:17px">${id?'Editar Cartão':'Novo Cartão'}</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">O cartão será criado na coluna onde você clicou "+ Cartão".</p>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div><label>Título *</label><input id="mTitle" value="${esc(card.title)}" placeholder="Título"/></div>
       <div><label>Descrição</label><textarea id="mDesc">${esc(card.description||'')}</textarea></div>
       <div><label>Prioridade</label><select id="mPri">${['Baixa','Média','Alta','Urgente'].map(p=>`<option${card.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
-      <div><label>Data de Prazo *</label><input type="date" id="mDue" value="${card.dueDate?fmtDateInput(card.dueDate):today}"/></div>
-      <div><label>Tags (vírgula)</label><input id="mTags" value="${esc(card.tags||'')}" placeholder="ex: safari, urgente"/></div>
+      <div><label>Data de Prazo</label><input type="date" id="mDue" value="${card.dueDate?fmtDateInput(card.dueDate):today}"/></div>
+      <div><label>Tags (vírgula)</label><input id="mTags" value="${esc(card.tags||'')}" placeholder="ex: urgente"/></div>
       <div><label>Observações</label><textarea id="mObs">${esc(card.observations||'')}</textarea></div>
       <div style="display:flex;gap:9px;margin-top:4px">
         <button class="btn btn-primary" style="flex:1" onclick="saveCard()">💾 Salvar</button>
@@ -485,12 +472,14 @@ function saveCard(){
   const title=document.getElementById('mTitle').value.trim();if(!title)return;
   const dueRaw=document.getElementById('mDue').value;
   const dueDate=dueRaw?new Date(dueRaw).toISOString():'';
+  // if editing, keep existing column; if new, use the column where + Cartão was clicked
   const columnId=editingCard
-    ?(S.cards.find(c=>c.id===editingCard)||{}).columnId||colByDate(dueDate)
-    :colByDate(dueDate);
-  const d={id:editingCard,title,description:document.getElementById('mDesc').value,columnId,priority:document.getElementById('mPri').value,tags:document.getElementById('mTags').value,observations:document.getElementById('mObs').value,dueDate};
+    ?(S.cards.find(c=>c.id===editingCard)||{}).columnId||'hoje'
+    :(openCardModal._defaultCol||'hoje');
+  const d={title,description:document.getElementById('mDesc').value,columnId,priority:document.getElementById('mPri').value,tags:document.getElementById('mTags').value,observations:document.getElementById('mObs').value,dueDate};
   if(editingCard){S.cards=S.cards.map(c=>c.id===editingCard?{...c,...d}:c);}
   else{S.cards.push({...d,id:uid(),createdAt:nowISO(),completedAt:null});}
+  openCardModal._defaultCol=null;
   closeModal();render();
 }
 
@@ -516,24 +505,18 @@ function renderIdeas(){
 }
 function openIdeaModal(id){
   const idea=id?S.ideas.find(x=>x.id===id):{title:'',description:'',category:'Convite Digital'};editingIdea=id;
-  openModal(`<h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar Ideia':'Nova Ideia'}</h3>
+  openModal(`<h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar':'Nova'} Ideia</h3>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div><label>Título *</label><input id="iTitle" value="${esc(idea.title)}" placeholder="Nome da ideia"/></div>
       <div><label>Descrição</label><textarea id="iDesc">${esc(idea.description||'')}</textarea></div>
       <div><label>Categoria</label><select id="iCat">${['Convite Digital','Tema Novo','Divulgação','Produto','Melhoria','Parceria','Outro'].map(c=>`<option${idea.category===c?' selected':''}>${c}</option>`).join('')}</select></div>
-      <div style="display:flex;gap:9px;margin-top:4px">
+      <div style="display:flex;gap:9px">
         <button class="btn btn-primary" style="flex:1" onclick="saveIdea()">💾 Salvar</button>
         <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
       </div>
     </div>`);
 }
-function saveIdea(){
-  const title=document.getElementById('iTitle').value.trim();if(!title)return;
-  const d={title,description:document.getElementById('iDesc').value,category:document.getElementById('iCat').value};
-  if(editingIdea){S.ideas=S.ideas.map(x=>x.id===editingIdea?{...x,...d}:x);}
-  else{S.ideas.push({...d,id:uid(),createdAt:nowISO()});}
-  closeModal();renderIdeas();
-}
+function saveIdea(){const title=document.getElementById('iTitle').value.trim();if(!title)return;const d={title,description:document.getElementById('iDesc').value,category:document.getElementById('iCat').value};if(editingIdea){S.ideas=S.ideas.map(x=>x.id===editingIdea?{...x,...d}:x);}else{S.ideas.push({...d,id:uid(),createdAt:nowISO()});}closeModal();renderIdeas();}
 function deleteIdea(id){S.ideas=S.ideas.filter(x=>x.id!==id);renderIdeas();}
 
 // ═══ CONVITES DO DIA ═══
@@ -542,64 +525,31 @@ function renderConvites(){
   const todayItems=S.convitesDodia.filter(p=>new Date(p.date).toDateString()===today);
   const week=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=7).reduce((a,p)=>a+Number(p.qty),0);
   const month=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=30).reduce((a,p)=>a+Number(p.qty),0);
-  const themeOpts=S.themes.map(t=>`<option value="${esc(t.name)}">`).join('');
-
-  // Build monthly history
   const monthMap={};
-  S.convitesDodia.forEach(p=>{
-    const d=new Date(p.date);
-    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    const label=d.toLocaleString('pt-BR',{month:'long',year:'numeric'});
-    if(!monthMap[key]){monthMap[key]={label,total:0,themes:{}};}
-    monthMap[key].total+=Number(p.qty);
-    if(!monthMap[key].themes[p.theme]){monthMap[key].themes[p.theme]=[];}
-    monthMap[key].themes[p.theme].push({qty:Number(p.qty),date:p.date,id:p.id});
-  });
+  S.convitesDodia.forEach(p=>{const d=new Date(p.date);const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;const label=d.toLocaleString('pt-BR',{month:'long',year:'numeric'});if(!monthMap[key]){monthMap[key]={label,total:0,themes:{}};}monthMap[key].total+=Number(p.qty);if(!monthMap[key].themes[p.theme]){monthMap[key].themes[p.theme]=[];}monthMap[key].themes[p.theme].push({qty:Number(p.qty),date:p.date,id:p.id});});
   const sortedMonths=Object.entries(monthMap).sort((a,b)=>b[0].localeCompare(a[0]));
-
   let histHtml=sortedMonths.map(([mkey,mdata])=>{
     const expanded=expandedMonths[mkey];
-    const themesHtml=Object.entries(mdata.themes).sort((a,b)=>{
-      const ta=b[1].reduce((s,x)=>s+x.qty,0),tb=a[1].reduce((s,x)=>s+x.qty,0);return ta-tb;
-    }).map(([tname,entries])=>{
+    const themesHtml=Object.entries(mdata.themes).sort((a,b)=>b[1].reduce((s,x)=>s+x.qty,0)-a[1].reduce((s,x)=>s+x.qty,0)).map(([tname,entries])=>{
       const total=entries.reduce((s,x)=>s+x.qty,0);
-      const tkey=mkey+'-'+tname;
-      const tExpanded=expandedThemes[tkey];
-      const datesHtml=entries.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(e=>`
-        <div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--muted)">
-          <span style="flex:1">📅 ${fmtDate(e.date)}</span>
-          <span style="font-weight:700;color:var(--accent)">${e.qty} convite(s)</span>
-          <button class="btn btn-ghost btn-sm" style="padding:2px 7px;color:#ef4444;font-size:11px" onclick="deleteConvite('${e.id}')">🗑️</button>
-        </div>`).join('');
-      return `<div class="theme-group">
-        <div class="theme-row" onclick="toggleTheme('${tkey}')">
-          <span style="font-size:12px;color:var(--muted)">${tExpanded?'▼':'▶'}</span>
-          <span style="flex:1;font-weight:600;font-size:13px">🎨 ${esc(tname)}</span>
-          <span style="font-weight:800;color:var(--accent);font-size:14px">${total}</span>
-        </div>
-        ${tExpanded?`<div class="theme-dates">${datesHtml}</div>`:''}
-      </div>`;
+      const tkey=mkey+'-'+tname;const tExpanded=expandedThemes[tkey];
+      const datesHtml=entries.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--muted)"><span style="flex:1">📅 ${fmtDate(e.date)}</span><span style="font-weight:700;color:var(--accent)">${e.qty}</span><button class="btn btn-ghost btn-sm" style="padding:2px 6px;color:#ef4444;font-size:11px" onclick="deleteConvite('${e.id}')">🗑️</button></div>`).join('');
+      return `<div class="theme-group"><div class="theme-row" onclick="toggleTheme('${tkey}')"><span style="font-size:12px;color:var(--muted)">${tExpanded?'▼':'▶'}</span><span style="flex:1;font-weight:600;font-size:13px">🎨 ${esc(tname)}</span><span style="font-weight:800;color:var(--accent)">${total}</span></div>${tExpanded?`<div class="theme-dates">${datesHtml}</div>`:''}</div>`;
     }).join('');
-    return `<div class="month-group">
-      <div class="month-header" onclick="toggleMonth('${mkey}')">
-        <span style="font-size:14px">${expanded?'▼':'▶'}</span>
-        <span style="flex:1;font-weight:800;font-size:15px;text-transform:capitalize">${mdata.label}</span>
-        <span class="badge" style="background:var(--accent)22;color:var(--accent)">${mdata.total} convites</span>
-      </div>
-      ${expanded?`<div class="month-body" style="padding:8px 16px">${themesHtml}</div>`:''}
-    </div>`;
+    return `<div class="month-group"><div class="month-header" onclick="toggleMonth('${mkey}')"><span>${expanded?'▼':'▶'}</span><span style="flex:1;font-weight:800;font-size:14px;text-transform:capitalize">${mdata.label}</span><span class="badge" style="background:var(--accent)22;color:var(--accent)">${mdata.total} convites</span></div>${expanded?`<div style="padding:8px 16px">${themesHtml}</div>`:''}</div>`;
   }).join('');
 
   document.getElementById('page-convites').innerHTML=`
     <h2 style="font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px">🎨 Convites do Dia</h2>
-    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Registre os convites produzidos hoje. Use +1/-1 para ajustar.</p>
-    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px">
-      <input list="themeListC" id="cTheme" placeholder="🎨 Tema..." style="flex:2;min-width:150px"/>
-      <datalist id="themeListC">${themeOpts}</datalist>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Registre os convites produzidos hoje.</p>
+    <div id="conviteInputWrap" class="ac-wrap" style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px">
+      <div class="ac-wrap" style="flex:2;min-width:150px;position:relative">
+        <input id="cTheme" placeholder="🎨 Tema..." autocomplete="off" oninput="showAC('cTheme','cAcList',allThemeNames)" onfocus="showAC('cTheme','cAcList',allThemeNames)" onblur="setTimeout(()=>hideAC('cAcList'),200)" onkeydown="acKeyDown(event,'cAcList')"/>
+        <div id="cAcList" class="ac-list hidden"></div>
+      </div>
       <input type="number" id="cQty" value="1" min="1" style="flex:1;min-width:70px"/>
       <button class="btn btn-primary" onclick="addConvite()">+ Registrar</button>
     </div>
-
     <div class="card" style="margin-bottom:14px">
       <h3 style="font-weight:800;margin-bottom:12px">📅 Produzidos Hoje</h3>
       ${todayItems.length===0?'<p style="color:var(--muted);font-size:13px">Nenhum registro hoje ainda.</p>':todayItems.map(p=>`
@@ -607,28 +557,17 @@ function renderConvites(){
           <span style="flex:1;font-weight:600">🎨 ${esc(p.theme)}</span>
           <div style="display:flex;align-items:center;gap:6px">
             <button class="btn-icon" onclick="adjustConvite('${p.id}',-1)">−</button>
-            <span style="font-weight:900;font-size:18px;color:var(--accent);min-width:30px;text-align:center">${p.qty}</span>
+            <span style="font-weight:900;font-size:18px;color:var(--accent);min-width:28px;text-align:center">${p.qty}</span>
             <button class="btn-icon" onclick="adjustConvite('${p.id}',1)">+</button>
           </div>
           <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteConvite('${p.id}')">🗑️</button>
         </div>`).join('')}
     </div>
-
     <div class="grid-2" style="margin-bottom:16px">
-      <div class="card" style="text-align:center">
-        <div style="font-size:38px;font-weight:900;color:var(--accent)">${week}</div>
-        <div style="color:var(--muted);font-size:13px">⚡ Esta semana</div>
-      </div>
-      <div class="card" style="text-align:center">
-        <div style="font-size:38px;font-weight:900;color:var(--accent2)">${month}</div>
-        <div style="color:var(--muted);font-size:13px">📈 Este mês</div>
-      </div>
+      <div class="card" style="text-align:center"><div style="font-size:38px;font-weight:900;color:var(--accent)">${week}</div><div style="color:var(--muted);font-size:13px">⚡ Esta semana</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:38px;font-weight:900;color:var(--accent2)">${month}</div><div style="color:var(--muted);font-size:13px">📈 Este mês</div></div>
     </div>
-
-    <div class="card">
-      <h3 style="font-weight:800;margin-bottom:12px">📋 Histórico por Mês</h3>
-      ${histHtml||'<p style="color:var(--muted);font-size:13px">Nenhum registro ainda.</p>'}
-    </div>`;
+    <div class="card"><h3 style="font-weight:800;margin-bottom:12px">📋 Histórico por Mês</h3>${histHtml||'<p style="color:var(--muted);font-size:13px">Nenhum registro ainda.</p>'}</div>`;
 }
 function toggleMonth(key){expandedMonths[key]=!expandedMonths[key];renderConvites();}
 function toggleTheme(key){expandedThemes[key]=!expandedThemes[key];renderConvites();}
@@ -640,126 +579,181 @@ function addConvite(){
   const ex=S.convitesDodia.find(p=>p.theme.toLowerCase()===theme.toLowerCase()&&new Date(p.date).toDateString()===today);
   if(ex){S.convitesDodia=S.convitesDodia.map(p=>p.id===ex.id?{...p,qty:Number(p.qty)+qty}:p);}
   else{S.convitesDodia.push({id:uid(),theme,qty,date:nowISO()});}
-  document.getElementById('cTheme').value='';
-  document.getElementById('cQty').value='1';
+  document.getElementById('cTheme').value='';document.getElementById('cQty').value='1';
   renderConvites();renderDashboard();
 }
-function adjustConvite(id,delta){
-  S.convitesDodia=S.convitesDodia.map(p=>{
-    if(p.id!==id)return p;
-    const newQty=Number(p.qty)+delta;
-    return newQty<=0?null:{...p,qty:newQty};
-  }).filter(Boolean);
-  renderConvites();renderDashboard();
-}
+function adjustConvite(id,delta){S.convitesDodia=S.convitesDodia.map(p=>{if(p.id!==id)return p;const n=Number(p.qty)+delta;return n<=0?null:{...p,qty:n};}).filter(Boolean);renderConvites();renderDashboard();}
 function deleteConvite(id){S.convitesDodia=S.convitesDodia.filter(x=>x.id!==id);renderConvites();renderDashboard();}
 
 // ═══ ORÇAMENTOS ═══
+let expandedOrcDays={};
+
 function renderOrcamentos(){
+  // Group orçamentos by date added
+  const dayMap={};
+  [...S.orcamentos].forEach(o=>{
+    const d=o.createdAt?new Date(o.createdAt).toDateString():new Date().toDateString();
+    const label=o.createdAt?new Date(o.createdAt).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}):'Hoje';
+    if(!dayMap[d]){dayMap[d]={label,items:[],key:d};}
+    dayMap[d].items.push(o);
+  });
+  const sortedDays=Object.entries(dayMap).sort((a,b)=>new Date(b[0])-new Date(a[0]));
+  // auto-expand today
+  if(sortedDays.length>0){const todayKey=new Date().toDateString();if(expandedOrcDays[todayKey]===undefined)expandedOrcDays[todayKey]=true;}
+
+  const renderOrcItem=o=>{
+    const inLib=S.themes.find(t=>t.name.toLowerCase()===o.theme.toLowerCase());
+    const models=inLib?Number(inLib.models):0;
+    const ins=inLib?themeInsight(models,o.count,0):null;
+    const needsSuggestion=o.count>0&&(!inLib||models<15);
+    return `<div class="orc-item" style="border-left-color:${o.count>=5?'#ef4444':o.count>=3?'#f97316':'#22c55e'};margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:14px">${esc(o.theme)}</div>
+          ${inLib?`<div style="font-size:12px;color:var(--muted);margin-top:2px">📚 ${models} modelo(s)</div>`:'<div style="font-size:12px;color:#f97316;margin-top:2px">⚠️ Não está na biblioteca</div>'}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="btn-icon" onclick="adjustOrc('${o.id}',-1)">−</button>
+          <span style="font-weight:900;font-size:17px;min-width:30px;text-align:center;color:${o.count>=5?'#ef4444':'var(--text)'}">${o.count}x</span>
+          <button class="btn-icon" onclick="adjustOrc('${o.id}',1)">+</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteOrc('${o.id}')">🗑️</button>
+      </div>
+    ${ins&&models<15?`<div style="display:flex;align-items:center;gap:10px;margin-top:8px;padding:8px 10px;background:${ins.cor}10;border-radius:8px;border-left:3px solid ${ins.cor}">
+        <span style="font-size:12px;color:${ins.cor};flex:1">${ins.emoji} ${ins.text}</span>
+        <button class="btn-suggest" onclick="sendToCriar('${o.theme}',${models},${o.count})">→ Convites para Criar</button>
+      </div>`:''}
+    </div>`;
+  };
+
+  const daysHtml=sortedDays.map(([dayKey,dayData])=>{
+    const exp=expandedOrcDays[dayKey]!==false;
+    const total=dayData.items.reduce((a,o)=>a+o.count,0);
+    const isToday=dayKey===new Date().toDateString();
+    return `<div style="background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface);border-left:4px solid var(--accent)" onclick="toggleOrcDay('${dayKey}')">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:14px;text-transform:capitalize">${isToday?'📅 Hoje — ':' '}${dayData.label}</div>
+          <div style="font-size:12px;color:var(--muted)">${dayData.items.length} tema(s) · ${total} orçamento(s)</div>
+        </div>
+        <span style="color:var(--accent);font-size:16px;font-weight:800">${exp?'▼':'▶'}</span>
+      </div>
+      ${exp?`<div style="padding:12px">${dayData.items.sort((a,b)=>b.count-a.count).map(renderOrcItem).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+
   document.getElementById('page-orcamentos').innerHTML=`
     <h2 style="font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px">💬 Orçamentos</h2>
-    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Registre os temas que os clientes vieram pedir preço. Use +1/-1 para corrigir.</p>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Registre os temas que os clientes vieram pedir preço.</p>
     <div style="display:flex;gap:9px;margin-bottom:18px">
-      <input id="orcInput" placeholder="💬 Tema do orçamento..." style="flex:1" onkeydown="if(event.key==='Enter')addOrc()"/>
+      <div class="ac-wrap" style="flex:1;position:relative">
+        <input id="orcInput" placeholder="💬 Tema do orçamento..." autocomplete="off"
+          oninput="showAC('orcInput','orcAcList',allThemeNames)"
+          onfocus="showAC('orcInput','orcAcList',allThemeNames)"
+          onblur="setTimeout(()=>hideAC('orcAcList'),200)"
+          onkeydown="if(event.key==='Enter'){addOrc();}"/>
+        <div id="orcAcList" class="ac-list hidden"></div>
+      </div>
       <button class="btn btn-primary" onclick="addOrc()">+ Registrar</button>
     </div>
-    ${[...S.orcamentos].sort((a,b)=>b.count-a.count).map(o=>{
-      const inLib=S.themes.find(t=>t.name.toLowerCase()===o.theme.toLowerCase());
-      const models=inLib?Number(inLib.models):0;
-      const insight=inLib?themeInsight(models,o.count):null;
-      return `<div class="orc-item" style="border-left-color:${o.count>=5?'#ef4444':o.count>=3?'#f97316':'#22c55e'}">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:${insight?8:0}px">
-          <div style="flex:1">
-            <div style="font-weight:800;font-size:15px">${esc(o.theme)}</div>
-            ${inLib?`<div style="font-size:12px;color:var(--muted);margin-top:2px">📚 ${models} modelo(s) na biblioteca</div>`:'<div style="font-size:12px;color:#f97316;margin-top:2px">⚠️ Não está na biblioteca</div>'}
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <button class="btn-icon" onclick="adjustOrc('${o.id}',-1)">−</button>
-            <span style="font-weight:900;font-size:18px;min-width:32px;text-align:center;color:${o.count>=5?'#ef4444':'var(--text)'}">${o.count}x</span>
-            <button class="btn-icon" onclick="adjustOrc('${o.id}',1)">+</button>
-          </div>
-          <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteOrc('${o.id}')">🗑️</button>
-        </div>
-        ${insight?`<div style="font-size:12px;color:${insight.cor};background:${insight.cor}15;padding:8px 11px;border-radius:8px;border-left:3px solid ${insight.cor}">🤖 ${insight.text}</div>`:''}
-      </div>`;
-    }).join('')}
-    ${S.orcamentos.length===0?'<p style="color:var(--muted)">Nenhum orçamento ainda.</p>':""}`;
+    ${S.orcamentos.length===0?'<p style="color:var(--muted)">Nenhum orçamento ainda.</p>':daysHtml}`;
 }
+function toggleOrcDay(key){expandedOrcDays[key]=!expandedOrcDays[key];renderOrcamentos();}
 function addOrc(){
   const i=document.getElementById('orcInput');const theme=i.value.trim();if(!theme)return;
   const ex=S.orcamentos.find(o=>o.theme.toLowerCase()===theme.toLowerCase());
   if(ex){S.orcamentos=S.orcamentos.map(o=>o.id===ex.id?{...o,count:o.count+1}:o);}
   else{S.orcamentos.push({id:uid(),theme,count:1,createdAt:nowISO()});}
-  i.value='';renderOrcamentos();renderDashboard();
+  i.value='';hideAC('orcAcList');renderOrcamentos();renderDashboard();
 }
-function adjustOrc(id,delta){
-  S.orcamentos=S.orcamentos.map(o=>{
-    if(o.id!==id)return o;
-    const newCount=o.count+delta;
-    return newCount<=0?null:{...o,count:newCount};
-  }).filter(Boolean);
-  renderOrcamentos();renderDashboard();
-}
+function adjustOrc(id,delta){S.orcamentos=S.orcamentos.map(o=>{if(o.id!==id)return o;const n=o.count+delta;return n<=0?null:{...o,count:n};}).filter(Boolean);renderOrcamentos();renderDashboard();}
 function deleteOrc(id){S.orcamentos=S.orcamentos.filter(x=>x.id!==id);renderOrcamentos();renderDashboard();}
 
+// ═══ SEND TO CRIAR ═══
+function sendToCriar(theme,models,orc){
+  const falta=15-models;
+  const existing=S.cards.find(c=>c.columnId==='criar'&&c.themeName&&c.themeName.toLowerCase()===theme.toLowerCase()&&c.completedAt===null);
+  if(existing){alert(`Já existe um cartão para "${theme}" na coluna Convites para Criar!`);return;}
+  S.cards.push({id:uid(),title:`Criar mais ${falta} modelo(s) de ${theme}`,description:`${orc} orçamento(s) recebido(s). Meta: 15 modelos.`,columnId:'criar',priority:models<=4?'Alta':'Média',tags:'sugestão',observations:'',dueDate:new Date(Date.now()+7*86400000).toISOString(),createdAt:nowISO(),completedAt:null,themeName:theme});
+  alert(`✅ Cartão criado na coluna "Convites para Criar"!`);
+  renderOrcamentos();
+}
+
 // ═══ LIBRARY ═══
+let expandedLibGroups={insuf:true,basico:false,bom:false,ampla:false};
+
 function renderLibrary(){
+  const q=(document.getElementById('libSearch')||{}).value||'';
+  const filtered=q?S.themes.filter(t=>t.name.toLowerCase().includes(q.toLowerCase())):S.themes;
+
+  const groups=[
+    {key:'insuf', emoji:'🔴', label:'Insuficiente', subtitle:'0 a 4 modelos', cor:'#ef4444', test:m=>m<=4},
+    {key:'basico',emoji:'🟠', label:'Básico',        subtitle:'5 a 14 modelos',cor:'#f97316', test:m=>m>=5&&m<=14},
+    {key:'bom',   emoji:'🟢', label:'Bem Abastecida',subtitle:'15 a 29 modelos',cor:'#22c55e',test:m=>m>=15&&m<=29},
+    {key:'ampla', emoji:'🔵', label:'Ampla',         subtitle:'30+ modelos',   cor:'#3b82f6', test:m=>m>=30},
+  ];
+
+  const renderThemeCard=t=>{
+    const models=Number(t.models||0),orc=getOrcCount(t.name),prodTotal=getTotalProd(t.name);
+    const ins=themeInsight(models,orc,0);
+    return `<div class="theme-card" style="margin-bottom:8px">
+      <div style="display:flex;gap:7px;align-items:center;margin-bottom:8px">
+        <div style="flex:1;font-weight:800;font-size:14px">🎨 ${esc(t.name)}</div>
+        <button class="btn btn-ghost btn-sm" onclick="openThemeModal('${t.id}')">✏️</button>
+        <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteTheme('${t.id}')">🗑️</button>
+      </div>
+      <div class="theme-stats">
+        <div class="theme-stat"><div class="theme-stat-val" style="color:var(--accent)">${models}</div><div class="theme-stat-lbl">Modelos</div></div>
+        <div class="theme-stat"><div class="theme-stat-val" style="color:#ec4899">${orc}</div><div class="theme-stat-lbl">Orçamentos</div></div>
+        <div class="theme-stat"><div class="theme-stat-val" style="color:#f97316">${prodTotal}</div><div class="theme-stat-lbl">Produzidos</div></div>
+      </div>
+      <div style="font-size:12px;color:${ins.cor};background:${ins.cor}10;padding:8px 10px;border-radius:8px;border-left:3px solid ${ins.cor};line-height:1.5;margin-bottom:8px">${ins.text}</div>
+      <button class="btn-suggest" style="width:100%" onclick="sendToCriar('${t.name}',${models},${orc})">📋 Enviar para Convites para Criar</button>
+      ${t.observations?`<div style="font-size:12px;color:var(--muted);margin-top:6px">${esc(t.observations)}</div>`:''}
+    </div>`;
+  };
+
+  const groupsHtml=groups.map(g=>{
+    const items=filtered.filter(t=>g.test(Number(t.models||0)));
+    const exp=expandedLibGroups[g.key];
+    return `<div style="background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px">
+      <div style="padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;background:${g.cor}10;border-left:4px solid ${g.cor}" onclick="toggleLibGroup('${g.key}')">
+        <span style="font-size:18px">${g.emoji}</span>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:15px;color:${g.cor}">${g.label}</div>
+          <div style="font-size:12px;color:var(--muted)">${g.subtitle}</div>
+        </div>
+        <span style="background:${g.cor}22;color:${g.cor};padding:3px 12px;border-radius:20px;font-size:13px;font-weight:800">${items.length} tema(s)</span>
+        <span style="color:${g.cor};font-size:16px;font-weight:800">${exp?'▼':'▶'}</span>
+      </div>
+      ${exp?`<div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+        ${items.length===0?`<p style="color:var(--muted);font-size:13px;padding:8px">Nenhum tema neste grupo.</p>`:items.map(renderThemeCard).join('')}
+      </div>`:''}
+    </div>`;
+  }).join('');
+
   document.getElementById('page-library').innerHTML=`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
       <h2 style="font-family:'Playfair Display',serif;font-size:26px">📚 Biblioteca de Temas</h2>
       <button class="btn btn-primary" onclick="openThemeModal(null)">+ Novo Tema</button>
     </div>
-    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Cadastre todos os seus temas. A análise é baseada na quantidade mínima saudável de modelos para o cliente não buscar variedade em outro lugar.</p>
-    <div class="grid-themes">
-      ${S.themes.length===0?'<p style="color:var(--muted)">Nenhum tema ainda.</p>':S.themes.map(t=>{
-        const models=Number(t.models||0),orc=getOrcCount(t.name),prodTotal=getTotalProd(t.name);
-        const insight=themeInsight(models,orc);
-        return `<div class="card ch">
-          <div style="display:flex;gap:7px;margin-bottom:10px">
-            <div style="flex:1;font-weight:800;font-size:15px">🎨 ${esc(t.name)}</div>
-            <button class="btn btn-ghost btn-sm" onclick="openThemeModal('${t.id}')">✏️</button>
-            <button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteTheme('${t.id}')">🗑️</button>
-          </div>
-          <div class="mini-stats">
-            <div class="mini-stat"><div class="mini-stat-val" style="color:var(--accent)">${models}</div><div class="mini-stat-lbl">MODELOS</div></div>
-            <div class="mini-stat"><div class="mini-stat-val" style="color:#ec4899">${orc}</div><div class="mini-stat-lbl">ORÇAMENTOS</div></div>
-            <div class="mini-stat"><div class="mini-stat-val" style="color:#f97316">${prodTotal}</div><div class="mini-stat-lbl">PRODUZIDOS</div></div>
-          </div>
-          <div style="font-size:12px;color:${insight.cor};background:${insight.cor}15;padding:9px 11px;border-radius:9px;border-left:3px solid ${insight.cor};line-height:1.6;margin-bottom:${t.observations?8:0}px">
-            🤖 ${insight.text}
-          </div>
-          ${t.observations?`<div style="font-size:12px;color:var(--muted)">${esc(t.observations)}</div>`:''}
-        </div>`;
-      }).join('')}
-    </div>`;
+    <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Temas organizados por nível de estoque. Clique no grupo para expandir.</p>
+    <div class="search-wrap"><input class="search-input" id="libSearch" placeholder="Buscar tema..." value="${esc(q)}" oninput="renderLibrary()"/></div>
+    ${groupsHtml}`;
 }
+function toggleLibGroup(key){expandedLibGroups[key]=!expandedLibGroups[key];renderLibrary();}
 function openThemeModal(id){
   const t=id?S.themes.find(x=>x.id===id):{name:'',models:0,observations:''};editingTheme=id;
-  openModal(`<h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar Tema':'Novo Tema'}</h3>
+  openModal(`<h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar':'Novo'} Tema</h3>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div><label>Nome do Tema *</label><input id="tName" value="${esc(t.name)}" placeholder="ex: Safari, Tiana"/></div>
       <div><label>Qtd de Modelos</label><input type="number" id="tModels" value="${t.models||0}" min="0"/></div>
       <div><label>Observações</label><textarea id="tObs">${esc(t.observations||'')}</textarea></div>
-      <div style="display:flex;gap:9px;margin-top:4px">
+      <div style="display:flex;gap:9px">
         <button class="btn btn-primary" style="flex:1" onclick="saveTheme()">💾 Salvar</button>
         <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
       </div>
     </div>`);
-}
-function autoCreateCard(name,models){
-  // Remove existing "criar" cards for this theme
-  S.cards=S.cards.filter(c=>!(c.columnId==='criar'&&c.auto===true&&c.themeName&&c.themeName.toLowerCase()===name.toLowerCase()));
-  if(models<15){
-    const falta=15-models;
-    const dueDate=new Date(Date.now()+7*86400000).toISOString();
-    S.cards.push({
-      id:uid(),title:`Criar mais ${falta} modelo(s) de ${name}`,
-      description:`Tema com estoque ${models<=4?'insuficiente':'básico'} (${models} modelo(s)). Meta: 15 modelos.`,
-      columnId:'criar',priority:models<=4?'Alta':'Média',tags:'auto,biblioteca',
-      observations:'Criado automaticamente pela biblioteca.',
-      dueDate,createdAt:nowISO(),completedAt:null,auto:true,themeName:name
-    });
-  }
 }
 function saveTheme(){
   const name=document.getElementById('tName').value.trim();if(!name)return;
@@ -767,7 +761,6 @@ function saveTheme(){
   const d={name,models,observations:document.getElementById('tObs').value};
   if(editingTheme){S.themes=S.themes.map(t=>t.id===editingTheme?{...t,...d}:t);}
   else{S.themes.push({...d,id:uid(),createdAt:nowISO()});}
-  autoCreateCard(name,models);
   closeModal();renderLibrary();renderDashboard();
 }
 function deleteTheme(id){S.themes=S.themes.filter(x=>x.id!==id);renderLibrary();renderDashboard();}
@@ -776,104 +769,64 @@ function deleteTheme(id){S.themes=S.themes.filter(x=>x.id!==id);renderLibrary();
 function renderBusca(){
   const q=(document.getElementById('searchInput')||{}).value||'';
   const results=q.trim()?S.themes.filter(t=>t.name.toLowerCase().includes(q.toLowerCase())):[];
-
   let resultsHtml='';
   results.forEach(t=>{
     const totalProd=getTotalProd(t.name);
     const monthMap={};
-    S.convitesDodia.filter(p=>p.theme.toLowerCase()===t.name.toLowerCase()).forEach(p=>{
-      const d=new Date(p.date);
-      const key=d.toLocaleString('pt-BR',{month:'long',year:'numeric'});
-      monthMap[key]=(monthMap[key]||0)+Number(p.qty);
-    });
+    S.convitesDodia.filter(p=>p.theme.toLowerCase()===t.name.toLowerCase()).forEach(p=>{const d=new Date(p.date);const key=d.toLocaleString('pt-BR',{month:'long',year:'numeric'});monthMap[key]=(monthMap[key]||0)+Number(p.qty);});
     const monthRows=Object.entries(monthMap).map(([m,n])=>`<span style="background:var(--surface);border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700">${m}: <span style="color:var(--accent)">${n}</span></span>`).join(' ');
-    const orc=getOrcCount(t.name);
-    const insight=themeInsight(Number(t.models||0),orc);
+    const orc=getOrcCount(t.name);const ins=themeInsight(Number(t.models||0),orc,0);
     resultsHtml+=`<div class="card" style="margin-bottom:12px">
       <div style="font-weight:800;font-size:16px;margin-bottom:8px">🎨 ${esc(t.name)}</div>
-      <div class="mini-stats" style="margin-bottom:10px">
-        <div class="mini-stat"><div class="mini-stat-val" style="color:var(--accent)">${t.models}</div><div class="mini-stat-lbl">MODELOS</div></div>
-        <div class="mini-stat"><div class="mini-stat-val" style="color:#ec4899">${orc}</div><div class="mini-stat-lbl">ORÇAMENTOS</div></div>
-        <div class="mini-stat"><div class="mini-stat-val" style="color:#f97316">${totalProd}</div><div class="mini-stat-lbl">TOTAL PROD.</div></div>
+      <div class="theme-stats" style="margin-bottom:10px">
+        <div class="theme-stat"><div class="theme-stat-val" style="color:var(--accent)">${t.models}</div><div class="theme-stat-lbl">Modelos</div></div>
+        <div class="theme-stat"><div class="theme-stat-val" style="color:#ec4899">${orc}</div><div class="theme-stat-lbl">Orçamentos</div></div>
+        <div class="theme-stat"><div class="theme-stat-val" style="color:#f97316">${totalProd}</div><div class="theme-stat-lbl">Total Prod.</div></div>
       </div>
       ${monthRows?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${monthRows}</div>`:''}
-      <div style="font-size:12px;color:${insight.cor};background:${insight.cor}15;padding:8px 11px;border-radius:8px;border-left:3px solid ${insight.cor}">🤖 ${insight.text}</div>
+      <div style="font-size:12px;color:${ins.cor};background:${ins.cor}15;padding:8px 11px;border-radius:8px;border-left:3px solid ${ins.cor}">${ins.emoji} ${ins.text}</div>
     </div>`;
   });
-
   document.getElementById('page-busca').innerHTML=`
     <h2 style="font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px">🔍 Busca de Temas</h2>
-    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Pesquise um tema para ver seu histórico completo de produção por mês.</p>
-    <input class="search-box" id="searchInput" placeholder="🔍 Digite o nome do tema..." value="${esc(q)}" oninput="renderBusca()"/>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Pesquise um tema para ver histórico e análise.</p>
+    <div class="search-wrap"><input class="search-input" id="searchInput" placeholder="Digite o nome do tema..." value="${esc(q)}" oninput="renderBusca()"/></div>
     ${q&&results.length===0?`<p style="color:var(--muted)">Nenhum tema encontrado para "${esc(q)}".</p>`:resultsHtml}
-    ${!q?`<p style="color:var(--muted)">Digite acima para buscar um tema.</p>`:''}`;
+    ${!q?`<p style="color:var(--muted)">Digite para buscar.</p>`:''}`;
+}
+
+// ═══ AUTOCOMPLETE ═══
+function showAC(inputId,listId,sourceFunc){
+  const input=document.getElementById(inputId);
+  const list=document.getElementById(listId);
+  if(!input||!list)return;
+  const q=input.value.toLowerCase().trim();
+  const all=sourceFunc();
+  const matches=q?all.filter(n=>n.toLowerCase().includes(q)):all.slice(0,8);
+  if(matches.length===0){list.classList.add('hidden');return;}
+  list.innerHTML=matches.map((n,i)=>`<div class="ac-item" data-val="${esc(n)}" onmousedown="selectAC('${inputId}','${listId}','${esc(n)}')">${esc(n)}</div>`).join('');
+  list.classList.remove('hidden');
+}
+function hideAC(listId){const l=document.getElementById(listId);if(l)l.classList.add('hidden');}
+function selectAC(inputId,listId,val){const i=document.getElementById(inputId);if(i)i.value=val;hideAC(listId);}
+function acKeyDown(e,listId){
+  const list=document.getElementById(listId);if(!list||list.classList.contains('hidden'))return;
+  const items=list.querySelectorAll('.ac-item');
+  let sel=list.querySelector('.ac-item.selected');
+  if(e.key==='ArrowDown'){e.preventDefault();const next=sel?sel.nextSibling:items[0];if(next){if(sel)sel.classList.remove('selected');next.classList.add('selected');}}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(sel){sel.classList.remove('selected');const prev=sel.previousSibling;if(prev)prev.classList.add('selected');}}
+  else if(e.key==='Enter'&&sel){e.preventDefault();selectAC(e.target.id,listId,sel.dataset.val);}
+  else if(e.key==='Escape'){hideAC(listId);}
 }
 
 // ═══ LOGO & TITLE ═══
-function changeLogo(event){
-  const file=event.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    document.getElementById('logoImg').src=e.target.result;
-    document.getElementById('logoImg').style.display='block';
-    document.getElementById('logoPlaceholder').style.display='none';
-    localStorage.setItem('convites_logo',e.target.result);
-  };
-  reader.readAsDataURL(file);event.target.value='';
-}
-function editTitle(){
-  const cur=document.getElementById('businessTitle').textContent;
-  const novo=prompt('Nome do seu negócio:',cur);
-  if(novo&&novo.trim()){document.getElementById('businessTitle').textContent=novo.trim();localStorage.setItem('convites_title',novo.trim());}
-}
-function loadLogoAndTitle(){
-  const logo=localStorage.getItem('convites_logo');
-  if(logo){document.getElementById('logoImg').src=logo;document.getElementById('logoImg').style.display='block';document.getElementById('logoPlaceholder').style.display='none';}
-  const title=localStorage.getItem('convites_title');
-  if(title)document.getElementById('businessTitle').textContent=title;
-}
+function changeLogo(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{document.getElementById('logoImg').src=e.target.result;document.getElementById('logoImg').style.display='block';document.getElementById('logoPlaceholder').style.display='none';localStorage.setItem('convites_logo',e.target.result);};reader.readAsDataURL(file);event.target.value='';}
+function editTitle(){const cur=document.getElementById('businessTitle').textContent;const novo=prompt('Nome do seu negócio:',cur);if(novo&&novo.trim()){document.getElementById('businessTitle').textContent=novo.trim();localStorage.setItem('convites_title',novo.trim());}}
+function loadLogoAndTitle(){const logo=localStorage.getItem('convites_logo');if(logo){document.getElementById('logoImg').src=logo;document.getElementById('logoImg').style.display='block';document.getElementById('logoPlaceholder').style.display='none';}const title=localStorage.getItem('convites_title');if(title)document.getElementById('businessTitle').textContent=title;}
 
-// ═══ EXPORT / IMPORT ═══
-function exportData(){
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=`convites-studio-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
-  a.click();URL.revokeObjectURL(url);
-}
-function importData(event){
-  const file=event.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const imp=JSON.parse(e.target.result);
-      if(!imp.columns||!imp.cards)throw new Error('inválido');
-      if(confirm('Isso substituirá todos os dados atuais. Confirma?')){S={...S,...imp};render();}
-    }catch{alert('❌ Arquivo inválido.');}
-  };
-  reader.readAsText(file);event.target.value='';
-}
-
-// ═══ DASHBOARD ALERTS ═══
-function buildDashAlerts(){
-  const overdue=S.cards.filter(c=>c.columnId!=='concluido'&&c.dueDate&&diffDays(c.dueDate,nowISO())>0);
-  const lowStock=S.themes.filter(t=>Number(t.models)<15);
-  const el=document.getElementById('dashAlerts');if(!el)return;
-  let html='';
-  if(overdue.length>0){
-    html+=`<div style="background:#ef444415;border:1.5px solid #ef444444;border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid #ef4444">
-      <div style="font-weight:800;color:#ef4444;margin-bottom:8px">⚠️ ${overdue.length} tarefa(s) atrasada(s)</div>
-      ${overdue.map(c=>`<div style="font-size:13px;display:flex;gap:8px"><span style="flex:1">${esc(c.title)}</span><span style="color:#ef4444;font-size:12px">venceu ${fmtDate(c.dueDate)}</span></div>`).join('')}
-    </div>`;
-  }
-  if(lowStock.length>0){
-    html+=`<div style="background:#f9731615;border:1.5px solid #f9731644;border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid #f97316">
-      <div style="font-weight:800;color:#f97316;margin-bottom:8px">🎨 Temas com menos de 15 modelos</div>
-      ${lowStock.map(t=>`<div style="font-size:13px;display:flex;gap:8px"><span style="flex:1">${esc(t.name)}</span><span style="color:#f97316;font-size:12px">${t.models} modelos</span></div>`).join('')}
-    </div>`;
-  }
-  el.innerHTML=html;
-}
+// ═══ EXPORT/IMPORT ═══
+function exportData(){const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`convites-studio-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;a.click();URL.revokeObjectURL(url);}
+function importData(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const imp=JSON.parse(e.target.result);if(!imp.columns||!imp.cards)throw new Error();if(confirm('Isso substituirá todos os dados. Confirma?')){S={...S,...imp};render();}}catch{alert('❌ Arquivo inválido.');}};reader.readAsText(file);event.target.value='';}
 
 // ═══ INIT ═══
 setVerse();
