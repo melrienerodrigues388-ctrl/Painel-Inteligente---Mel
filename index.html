@@ -186,12 +186,32 @@ let editingCard=null,editingIdea=null,editingTheme=null;
 let expandedMonths={},expandedThemes={};
 let showAllAnalise=false;
 
+// ═══ SAVE / LOAD ═══
+function saveState(){
+  try{localStorage.setItem('convites_state',JSON.stringify(S));}
+  catch(e){console.warn('Erro ao salvar:',e);}
+}
+function loadState(){
+  try{
+    const raw=localStorage.getItem('convites_state');
+    if(raw){
+      const saved=JSON.parse(raw);
+      // merge preserving defaults
+      S={...S,...saved};
+      // ensure columns always exist
+      if(!S.columns||S.columns.length===0)S.columns=[...defaultColumns];
+      document.body.classList.toggle('dark',S.dark);
+      document.getElementById('darkBtn').textContent=S.dark?'☀️':'🌙';
+    }
+  }catch(e){console.warn('Erro ao carregar:',e);}
+}
+
 // ═══ DARK/VERSE ═══
-function toggleDark(){S.dark=!S.dark;document.body.classList.toggle('dark',S.dark);document.getElementById('darkBtn').textContent=S.dark?'☀️':'🌙';render();}
+function toggleDark(){S.dark=!S.dark;document.body.classList.toggle('dark',S.dark);document.getElementById('darkBtn').textContent=S.dark?'☀️':'🌙';saveState();render();}
 function setVerse(){const v=VERSES[new Date().getDate()%VERSES.length];document.getElementById('verseText').textContent=`"${v.text}" `;document.getElementById('verseRef').textContent=v.ref;}
 
 // ═══ TABS ═══
-function switchTab(t){S.tab=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.toggle('hidden',p.id!=='page-'+t));render();}
+function switchTab(t){S.tab=t;saveState();document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.toggle('hidden',p.id!=='page-'+t));render();}
 document.getElementById('tabs').addEventListener('click',e=>{if(e.target.dataset.tab)switchTab(e.target.dataset.tab);});
 
 // ═══ MODAL ═══
@@ -200,6 +220,7 @@ function closeModal(){document.getElementById('modalOverlay').classList.add('hid
 
 // ═══ RENDER ═══
 function render(){
+  saveState();
   const t=S.tab;
   if(t==='dashboard')renderDashboard();
   else if(t==='kanban')renderKanban();
@@ -829,6 +850,7 @@ function exportData(){const blob=new Blob([JSON.stringify(S,null,2)],{type:'appl
 function importData(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const imp=JSON.parse(e.target.result);if(!imp.columns||!imp.cards)throw new Error();if(confirm('Isso substituirá todos os dados. Confirma?')){S={...S,...imp};render();}}catch{alert('❌ Arquivo inválido.');}};reader.readAsText(file);event.target.value='';}
 
 // ═══ INIT ═══
+loadState();
 setVerse();
 loadLogoAndTitle();
 renderDashboard();
