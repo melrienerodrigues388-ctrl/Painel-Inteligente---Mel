@@ -185,6 +185,11 @@ let dragCardId=null,dragColId=null,dragOverCardId=null;
 let editingCard=null,editingIdea=null,editingTheme=null;
 let expandedMonths={},expandedThemes={};
 let showAllAnalise=false;
+let showAnalise=true; // análise do mês começa expandida
+let showProduzidos=false;
+let showOrcamentos=false;
+let showUrgentAlert=false;
+let showOverdueAlert=false;
 
 // ═══ SAVE / LOAD ═══
 function saveState(){
@@ -196,10 +201,15 @@ function loadState(){
     const raw=localStorage.getItem('convites_state');
     if(raw){
       const saved=JSON.parse(raw);
-      // merge preserving defaults
       S={...S,...saved};
-      // ensure columns always exist
       if(!S.columns||S.columns.length===0)S.columns=[...defaultColumns];
+      // remove duplicate themes (keep first occurrence, case-insensitive)
+      const seen=new Set();
+      S.themes=S.themes.filter(t=>{
+        const key=t.name.toLowerCase().trim();
+        if(seen.has(key))return false;
+        seen.add(key);return true;
+      });
       document.body.classList.toggle('dark',S.dark);
       document.getElementById('darkBtn').textContent=S.dark?'☀️':'🌙';
     }
@@ -265,30 +275,74 @@ function renderDashboard(){
   const week=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=7).reduce((a,p)=>a+Number(p.qty),0);
   const month=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=30).reduce((a,p)=>a+Number(p.qty),0);
   const byTheme={};S.convitesDodia.forEach(p=>{byTheme[p.theme]=(byTheme[p.theme]||0)+Number(p.qty);});
-  const topProd=Object.entries(byTheme).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const topOrc=[...S.orcamentos].sort((a,b)=>b.count-a.count).slice(0,5);
+  const topProd=Object.entries(byTheme).sort((a,b)=>b[1]-a[1]);
+  const topOrc=[...S.orcamentos].sort((a,b)=>b.count-a.count);
 
-  // alerts
+  // — Alerts: Tarefas atrasadas —
   const overdue=S.cards.filter(c=>c.columnId!=='concluido'&&c.dueDate&&diffDays(c.dueDate,nowISO())>0);
-  const urgent=S.themes.filter(t=>{const m=Number(t.models||0);const o=getOrcCount(t.name);return o>0&&m<15;});
-  let alertsHtml='';
-  if(overdue.length>0){alertsHtml+=`<div style="background:#ef444415;border:1.5px solid #ef444444;border-radius:12px;padding:12px 16px;margin-bottom:10px;border-left:4px solid #ef4444"><div style="font-weight:800;color:#ef4444;margin-bottom:6px">⚠️ ${overdue.length} tarefa(s) atrasada(s)</div>${overdue.map(c=>`<div style="font-size:13px;display:flex;gap:8px"><span style="flex:1">${esc(c.title)}</span><span style="color:#ef4444;font-size:12px">venceu ${fmtDate(c.dueDate)}</span></div>`).join('')}</div>`;}
-  if(urgent.length>0){alertsHtml+=`<div style="background:#f9731615;border:1.5px solid #f9731644;border-radius:12px;padding:12px 16px;margin-bottom:10px;border-left:4px solid #f97316"><div style="font-weight:800;color:#f97316;margin-bottom:6px">🎨 Temas com orçamentos e poucos modelos</div>${urgent.map(t=>`<div style="font-size:13px;display:flex;gap:8px"><span style="flex:1">${esc(t.name)}</span><span style="color:#f97316;font-size:12px">${t.models} modelos · ${getOrcCount(t.name)} orçamentos</span></div>`).join('')}</div>`;}
+  let overdueHtml='';
+  if(overdue.length>0){
+    overdueHtml=`<div style="background:#ef444415;border:1.5px solid #ef444444;border-radius:12px;padding:12px 16px;margin-bottom:10px;border-left:4px solid #ef4444">
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showOverdueAlert=!showOverdueAlert;renderDashboard()">
+        <span style="font-weight:800;color:#ef4444;flex:1">⚠️ ${overdue.length} tarefa(s) atrasada(s)</span>
+        <span style="color:#ef4444;font-size:13px">${showOverdueAlert?'▲':'▼'}</span>
+      </div>
+      ${showOverdueAlert?`<div style="margin-top:8px">${overdue.map(c=>`<div style="font-size:13px;display:flex;gap:8px;margin-top:4px"><span style="flex:1">${esc(c.title)}</span><span style="color:#ef4444;font-size:12px">venceu ${fmtDate(c.dueDate)}</span></div>`).join('')}</div>`:''}
+    </div>`;
+  }
 
-  // analise mes — only show themes with activity or low stock + orders
+  // — Alerts: Temas com poucos modelos —
+  const urgent=S.themes.filter(t=>{const m=Number(t.models||0);const o=getOrcCount(t.name);return o>0&&m<15;});
+  let urgentHtml='';
+  if(urgent.length>0){
+    urgentHtml=`<div style="background:#f9731615;border:1.5px solid #f9731644;border-radius:12px;padding:12px 16px;margin-bottom:10px;border-left:4px solid #f97316">
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showUrgentAlert=!showUrgentAlert;renderDashboard()">
+        <span style="font-weight:800;color:#f97316;flex:1">🎨 Temas com orçamentos e poucos modelos (${urgent.length})</span>
+        <span style="color:#f97316;font-size:13px">${showUrgentAlert?'▲':'▼'}</span>
+      </div>
+      ${showUrgentAlert?`<div style="margin-top:8px">${urgent.map(t=>`<div style="font-size:13px;display:flex;gap:8px;margin-top:4px"><span style="flex:1">${esc(t.name)}</span><span style="color:#f97316;font-size:12px">${t.models} modelos · ${getOrcCount(t.name)} orçamentos</span></div>`).join('')}</div>`:''}
+    </div>`;
+  }
+
+  // — Mais Produzidos —
+  const top10Prod=topProd.slice(0,10);
+  const extraProd=topProd.slice(10);
+  const prodHtml=`<div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:${showProduzidos?12:0}px;cursor:pointer" onclick="showProduzidos=!showProduzidos;renderDashboard()">
+      <h3 style="font-weight:800;color:var(--accent);flex:1;margin:0">🏆 Mais Produzidos</h3>
+      <span style="font-size:12px;color:var(--muted)">${topProd.length} tema(s)</span>
+      <span style="color:var(--muted);font-size:13px">${showProduzidos?'▲':'▼'}</span>
+    </div>
+    ${showProduzidos?`${top10Prod.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados ainda.</p>':top10Prod.map(([t,n],i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-weight:900;color:var(--accent);width:22px">${i+1}º</span><span style="flex:1;font-weight:600;font-size:13px">${esc(t)}</span><span class="badge" style="background:var(--surface)">${n}</span></div>`).join('')}
+    ${extraProd.length>0?`<div style="font-size:12px;color:var(--muted);margin-top:4px">+${extraProd.length} outros temas</div>`:''}`:
+    `<p style="font-size:12px;color:var(--muted);margin:0">${topProd.length===0?'Sem dados ainda.':topProd.slice(0,3).map(([t,n])=>`${esc(t)} (${n})`).join(' · ')+(topProd.length>3?' · ...':'')}</p>`}
+  </div>`;
+
+  // — Mais Orçamentos —
+  const top10Orc=topOrc.slice(0,10);
+  const orcHtml=`<div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:${showOrcamentos?12:0}px;cursor:pointer" onclick="showOrcamentos=!showOrcamentos;renderDashboard()">
+      <h3 style="font-weight:800;color:var(--accent2);flex:1;margin:0">💬 Mais Orçamentos</h3>
+      <span style="font-size:12px;color:var(--muted)">${topOrc.length} tema(s)</span>
+      <span style="color:var(--muted);font-size:13px">${showOrcamentos?'▲':'▼'}</span>
+    </div>
+    ${showOrcamentos?`${top10Orc.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados ainda.</p>':top10Orc.map((o,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-weight:900;color:var(--accent2);width:22px">${i+1}º</span><span style="flex:1;font-weight:600;font-size:13px">${esc(o.theme)}</span><span class="badge" style="background:#ec489922;color:#ec4899">${o.count}x</span></div>`).join('')}`:
+    `<p style="font-size:12px;color:var(--muted);margin:0">${topOrc.length===0?'Sem dados ainda.':topOrc.slice(0,3).map(o=>`${esc(o.theme)} (${o.count}x)`).join(' · ')+(topOrc.length>3?' · ...':'')}</p>`}
+  </div>`;
+
+  // — Análise do Mês —
   const now=new Date(),mes=now.toLocaleString('pt-BR',{month:'long',year:'numeric'});
-  const activeThemes=S.themes.filter(t=>{const o=getOrcCount(t.name),pm=getMonthProd(t.name),m=Number(t.models||0);return o>0||pm>0||(m<15&&o>0);});
-  const sorted=[...activeThemes].sort((a,b)=>{const pa=themeInsight(Number(a.models||0),getOrcCount(a.name),getMonthProd(a.name)).priority;const pb=themeInsight(Number(b.models||0),getOrcCount(b.name),getMonthProd(b.name)).priority;return{Alta:0,Média:1,Baixa:2}[pa]-{Alta:0,Média:1,Baixa:2}[pb];});
-  const highMed=sorted.filter(t=>['Alta','Média'].includes(themeInsight(Number(t.models||0),getOrcCount(t.name),getMonthProd(t.name)).priority));
-  const low=sorted.filter(t=>themeInsight(Number(t.models||0),getOrcCount(t.name),getMonthProd(t.name)).priority==='Baixa');
-  
+  const activeThemes=S.themes.filter(t=>{const o=getOrcCount(t.name),pm=getMonthProd(t.name);return o>0||pm>0;});
+  const sortedT=[...activeThemes].sort((a,b)=>{const pa=themeInsight(Number(a.models||0),getOrcCount(a.name),getMonthProd(a.name)).priority;const pb=themeInsight(Number(b.models||0),getOrcCount(b.name),getMonthProd(b.name)).priority;return{Alta:0,Média:1,Baixa:2}[pa]-{Alta:0,Média:1,Baixa:2}[pb];});
+  const highMed=sortedT.filter(t=>['Alta','Média'].includes(themeInsight(Number(t.models||0),getOrcCount(t.name),getMonthProd(t.name)).priority));
+  const low=sortedT.filter(t=>themeInsight(Number(t.models||0),getOrcCount(t.name),getMonthProd(t.name)).priority==='Baixa');
   const renderAnaliseItem=t=>{
     const m=Number(t.models||0),o=getOrcCount(t.name),pm=getMonthProd(t.name);
     const ins=themeInsight(m,o,pm);
     const priColor={Alta:'#ef4444',Média:'#f97316',Baixa:'#22c55e'}[ins.priority];
     const precisa=m<15?15-m:0;
     return `<div style="background:${ins.cor}08;border-left:4px solid ${ins.cor};border-radius:10px;padding:11px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <span style="font-size:16px">${ins.emoji}</span>
+      <span style="font-size:15px">${ins.emoji}</span>
       <strong style="color:${ins.cor};font-size:13px">${esc(t.name)}</strong>
       <span style="background:${priColor}22;color:${priColor};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800">▲ ${ins.priority}</span>
       <span style="background:${ins.cor}22;color:${ins.cor};padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">${ins.status}</span>
@@ -302,17 +356,20 @@ function renderDashboard(){
     <div class="grid-stats">
       ${[{label:'Tarefas',value:open,emoji:'📋',color:'#3b82f6'},{label:'Concluídas',value:done,emoji:'✅',color:'#22c55e'},{label:'Ideias',value:S.ideas.length,emoji:'💡',color:'#eab308'},{label:'Orçamentos',value:S.orcamentos.length,emoji:'💬',color:'#ec4899'},{label:'Semana',value:week,emoji:'⚡',color:'#f97316'},{label:'Mês',value:month,emoji:'📈',color:'#a855f7'},{label:'Temas',value:S.themes.length,emoji:'🎨',color:'#14b8a6'}].map(s=>`<div class="card ch" style="border-left:4px solid ${s.color};padding:14px"><div style="font-size:20px;margin-bottom:4px">${s.emoji}</div><div style="font-size:26px;font-weight:900;color:${s.color}">${s.value}</div><div style="font-size:11px;color:var(--muted);font-weight:600">${s.label}</div></div>`).join('')}
     </div>
-    ${alertsHtml}
-    <div class="grid-2" style="margin-bottom:16px">
-      <div class="card"><h3 style="font-weight:800;margin-bottom:12px;color:var(--accent)">🏆 Mais Produzidos</h3>${topProd.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados</p>':topProd.map(([t,n],i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-weight:900;color:var(--accent);width:22px">${i+1}º</span><span style="flex:1;font-weight:600">${esc(t)}</span><span class="badge" style="background:var(--surface)">${n}</span></div>`).join('')}</div>
-      <div class="card"><h3 style="font-weight:800;margin-bottom:12px;color:var(--accent2)">💬 Mais Orçamentos</h3>${topOrc.length===0?'<p style="color:var(--muted);font-size:13px">Sem dados</p>':topOrc.map((o,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-weight:900;color:var(--accent2);width:22px">${i+1}º</span><span style="flex:1;font-weight:600">${esc(o.theme)}</span><span class="badge" style="background:#ec489922;color:#ec4899">${o.count}x</span></div>`).join('')}</div>
-    </div>
+    ${overdueHtml}${urgentHtml}
+    <div class="grid-2" style="margin-bottom:16px">${prodHtml}${orcHtml}</div>
     <div class="card">
-      <h3 style="font-weight:800;margin-bottom:12px;font-size:15px">📊 Análise do Mês — ${mes}</h3>
-      ${highMed.length===0&&low.length===0?'<p style="color:var(--muted);font-size:13px">Registre orçamentos e produções para ver a análise.</p>':''}
-      ${highMed.map(renderAnaliseItem).join('')}
-      ${low.length>0?`<div id="lowAnalise" class="${showAllAnalise?'':'hidden'}">${low.map(renderAnaliseItem).join('')}</div>
-      <button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:12px" onclick="showAllAnalise=!showAllAnalise;renderDashboard()">${showAllAnalise?'▲ Ver menos':'▼ Ver temas bem abastecidos ('+low.length+')'}</button>`:''}
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showAnalise=!showAnalise;renderDashboard()">
+        <h3 style="font-weight:800;font-size:15px;flex:1;margin:0">📊 Análise do Mês — ${mes}</h3>
+        ${sortedT.length>0?`<span style="font-size:12px;color:var(--muted)">${sortedT.length} tema(s)</span>`:''}
+        <span style="color:var(--muted);font-size:14px">${showAnalise?'▲':'▼'}</span>
+      </div>
+      ${showAnalise?`<div style="margin-top:12px">
+        ${sortedT.length===0?'<p style="color:var(--muted);font-size:13px">Registre orçamentos e produções para ver a análise.</p>':''}
+        ${highMed.map(renderAnaliseItem).join('')}
+        ${low.length>0?`<div id="lowAnalise" class="${showAllAnalise?'':'hidden'}">${low.map(renderAnaliseItem).join('')}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:12px" onclick="event.stopPropagation();showAllAnalise=!showAllAnalise;renderDashboard()">${showAllAnalise?'▲ Ver menos':'▼ Ver temas bem abastecidos ('+low.length+')'}</button>`:''}
+      </div>`:''}
     </div>`;
 }
 
@@ -778,6 +835,8 @@ function openThemeModal(id){
 }
 function saveTheme(){
   const name=document.getElementById('tName').value.trim();if(!name)return;
+  const dup=S.themes.find(t=>t.name.toLowerCase()===name.toLowerCase()&&t.id!==editingTheme);
+  if(dup){alert('⚠️ Este tema já está cadastrado!');return;}
   const models=parseInt(document.getElementById('tModels').value)||0;
   const d={name,models,observations:document.getElementById('tObs').value};
   if(editingTheme){S.themes=S.themes.map(t=>t.id===editingTheme?{...t,...d}:t);}
