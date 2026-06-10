@@ -793,7 +793,8 @@ function renderLibrary(){
 
   const groupsHtml=groups.map(g=>{
     const items=filtered.filter(t=>g.test(Number(t.models||0)));
-    const exp=expandedLibGroups[g.key];
+    // auto-expand if searching and has results; otherwise use manual state
+    const exp=q ? (items.length>0) : expandedLibGroups[g.key];
     return `<div style="background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px">
       <div style="padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;background:${g.cor}10;border-left:4px solid ${g.cor}" onclick="toggleLibGroup('${g.key}')">
         <span style="font-size:18px">${g.emoji}</span>
