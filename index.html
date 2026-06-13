@@ -749,11 +749,8 @@ function renderOrcamentos(lastAddedId){
     </div>
     ${lastAddedId?`<div style="background:#22c55e18;border:1.5px solid #22c55e44;border-radius:12px;padding:12px 16px;margin-bottom:14px;border-left:4px solid #22c55e;display:flex;align-items:center;gap:10px">
       <span style="font-size:20px">✅</span>
-      <div style="flex:1">
-        <div style="font-weight:800;color:#22c55e">Orçamento registrado!</div>
-        <div style="font-size:13px;color:var(--muted)">🎨 ${esc((S.orcamentos.find(o=>o.id===lastAddedId)||{}).theme||'')} · ${(S.orcamentos.find(o=>o.id===lastAddedId)||{}).count||1}x</div>
-      </div>
-      <div style="font-size:13px;color:var(--muted)">${S.orcamentos.length} tema(s) cadastrado(s) ▼</div>
+      <div><div style="font-weight:800;color:#22c55e">Orçamento registrado!</div>
+      <div style="font-size:13px;color:var(--muted)">🎨 ${esc((S.orcamentos.find(o=>o.id===lastAddedId)||{}).theme||'')} · ${(S.orcamentos.find(o=>o.id===lastAddedId)||{}).count||1}x</div></div>
     </div>`:''}
     ${S.orcamentos.length===0?'<p style="color:var(--muted)">Nenhum orçamento ainda.</p>':daysHtml}`;
 }
@@ -825,12 +822,12 @@ function renderLibrary(){
           <div style="font-weight:800;font-size:15px;color:${g.cor}">${g.label}</div>
           <div style="font-size:12px;color:var(--muted)">${g.subtitle}</div>
         </div>
-        <span id="lib-badge-${g.key}" style="background:${g.cor}22;color:${g.cor};padding:3px 12px;border-radius:20px;font-size:13px;font-weight:800">${items.length} tema(s)</span>
+        <span style="background:${g.cor}22;color:${g.cor};padding:3px 12px;border-radius:20px;font-size:13px;font-weight:800">${items.length} tema(s)</span>
         <span style="color:${g.cor};font-size:16px;font-weight:800">${exp?'▼':'▶'}</span>
       </div>
-      ${exp?`<div id="lib-body-${g.key}" style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
-        ${items.length===0?`<p style="color:var(--muted);font-size:13px;padding:8px">Nenhum tema neste grupo.</p>`:items.map(t=>renderThemeCardHtml(t)).join('')}
-      </div>`:`<div id="lib-body-${g.key}" style="display:none"></div>`}
+      ${exp?`<div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">
+        ${items.length===0?`<p style="color:var(--muted);font-size:13px;padding:8px">Nenhum tema neste grupo.</p>`:items.map(renderThemeCard).join('')}
+      </div>`:''}
     </div>`;
   }).join('');
 
@@ -840,55 +837,10 @@ function renderLibrary(){
       <button class="btn btn-primary" onclick="openThemeModal(null)">+ Novo Tema</button>
     </div>
     <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Temas organizados por nível de estoque. Clique no grupo para expandir.</p>
-    <div class="search-wrap"><input class="search-input" id="libSearch" placeholder="Buscar tema..." value="${esc(q)}" oninput="filterLibrary(this.value)"/></div>
+    <div class="search-wrap"><input class="search-input" id="libSearch" placeholder="Buscar tema..." value="${esc(q)}" oninput="renderLibrary()"/></div>
     ${groupsHtml}`;
 }
 function toggleLibGroup(key){expandedLibGroups[key]=!expandedLibGroups[key];renderLibrary();}
-
-function filterLibrary(q){
-  // Re-render only the groups content without losing focus
-  const groups=[
-    {key:'insuf', emoji:'🔴', label:'Insuficiente', subtitle:'0 a 4 modelos', cor:'#ef4444', test:m=>m<=4},
-    {key:'basico',emoji:'🟠', label:'Básico',        subtitle:'5 a 14 modelos',cor:'#f97316', test:m=>m>=5&&m<=14},
-    {key:'bom',   emoji:'🟢', label:'Bem Abastecida',subtitle:'15 a 29 modelos',cor:'#22c55e',test:m=>m>=15&&m<=29},
-    {key:'ampla', emoji:'🔵', label:'Ampla',         subtitle:'30+ modelos',   cor:'#3b82f6', test:m=>m>=30},
-  ];
-  const filtered=q?S.themes.filter(t=>t.name.toLowerCase().includes(q.toLowerCase())):S.themes;
-  groups.forEach(g=>{
-    const items=filtered.filter(t=>g.test(Number(t.models||0)));
-    // update count badge
-    const badge=document.getElementById('lib-badge-'+g.key);
-    if(badge)badge.textContent=items.length+' tema(s)';
-    // update body if expanded
-    const body=document.getElementById('lib-body-'+g.key);
-    if(body){
-      body.innerHTML=items.length===0
-        ?'<p style="color:var(--muted);font-size:13px;padding:8px">Nenhum tema encontrado.</p>'
-        :items.map(t=>renderThemeCardHtml(t)).join('');
-    }
-  });
-}
-
-function renderThemeCardHtml(t){
-  const models=Number(t.models||0),orc=getOrcCount(t.name),prodTotal=getTotalProd(t.name);
-  const ins=themeInsight(models,orc,0);
-  const needsSuggestion=orc>0&&models<15;
-  return '<div class="theme-card" style="margin-bottom:8px">'+
-    '<div style="display:flex;gap:7px;align-items:center;margin-bottom:8px">'+
-    '<div style="flex:1;font-weight:800;font-size:14px">🎨 '+esc(t.name)+'</div>'+
-    '<button class="btn btn-ghost btn-sm" onclick="openThemeModal(''+t.id+'')">✏️</button>'+
-    '<button class="btn btn-ghost btn-sm" style="color:#ef4444" onclick="deleteTheme(''+t.id+'')">🗑️</button>'+
-    '</div>'+
-    '<div class="theme-stats">'+
-    '<div class="theme-stat"><div class="theme-stat-val" style="color:var(--accent)">'+models+'</div><div class="theme-stat-lbl">Modelos</div></div>'+
-    '<div class="theme-stat"><div class="theme-stat-val" style="color:#ec4899">'+orc+'</div><div class="theme-stat-lbl">Orçamentos</div></div>'+
-    '<div class="theme-stat"><div class="theme-stat-val" style="color:#f97316">'+prodTotal+'</div><div class="theme-stat-lbl">Produzidos</div></div>'+
-    '</div>'+
-    '<div style="font-size:12px;color:'+ins.cor+';background:'+ins.cor+'10;padding:8px 10px;border-radius:8px;border-left:3px solid '+ins.cor+';line-height:1.5;'+(needsSuggestion?'margin-bottom:8px':'')+'">'+ins.text+'</div>'+
-    (needsSuggestion?'<button class="btn-suggest" style="width:100%" onclick="sendToCriar(''+esc(t.name)+'','+models+','+orc+')">→ Enviar para Convites para Criar</button>':'')+
-    (t.observations?'<div style="font-size:12px;color:var(--muted);margin-top:6px">'+esc(t.observations)+'</div>':'')+
-    '</div>';
-}
 function openThemeModal(id){
   const t=id?S.themes.find(x=>x.id===id):{name:'',models:0,observations:''};editingTheme=id;
   openModal(`<h3 style="font-weight:800;margin-bottom:16px;font-size:17px">${id?'Editar':'Novo'} Tema</h3>
