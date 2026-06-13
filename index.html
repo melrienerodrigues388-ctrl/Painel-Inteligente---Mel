@@ -598,7 +598,7 @@ function saveIdea(){const title=document.getElementById('iTitle').value.trim();i
 function deleteIdea(id){S.ideas=S.ideas.filter(x=>x.id!==id);renderIdeas();}
 
 // ═══ CONVITES DO DIA ═══
-function renderConvites(){
+function renderConvites(lastAdded){
   const today=new Date().toDateString();
   const todayItems=S.convitesDodia.filter(p=>new Date(p.date).toDateString()===today);
   const week=S.convitesDodia.filter(p=>diffDays(p.date,nowISO())<=7).reduce((a,p)=>a+Number(p.qty),0);
@@ -620,14 +620,21 @@ function renderConvites(){
   document.getElementById('page-convites').innerHTML=`
     <h2 style="font-family:'Playfair Display',serif;font-size:26px;margin-bottom:6px">🎨 Convites do Dia</h2>
     <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Registre os convites produzidos hoje.</p>
-    <div id="conviteInputWrap" class="ac-wrap" style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px">
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-end">
       <div class="ac-wrap" style="flex:2;min-width:150px;position:relative">
+        <label>Tema</label>
         <input id="cTheme" placeholder="🎨 Tema..." autocomplete="off" oninput="showAC('cTheme','cAcList',allThemeNames)" onfocus="showAC('cTheme','cAcList',allThemeNames)" onblur="setTimeout(()=>hideAC('cAcList'),200)" onkeydown="acKeyDown(event,'cAcList')"/>
         <div id="cAcList" class="ac-list hidden"></div>
       </div>
-      <input type="number" id="cQty" value="1" min="1" style="flex:1;min-width:70px"/>
-      <button class="btn btn-primary" onclick="addConvite()">+ Registrar</button>
+      <div style="flex:1;min-width:70px"><label>Qtd</label><input type="number" id="cQty" value="1" min="1"/></div>
+      <div style="flex:1;min-width:130px"><label>Data</label><input type="date" id="cDate" value="${new Date().toISOString().slice(0,10)}"/></div>
+      <button class="btn btn-primary" style="align-self:flex-end" onclick="addConvite()">+ Registrar</button>
     </div>
+    ${lastAdded?`<div style="background:#22c55e18;border:1.5px solid #22c55e44;border-radius:12px;padding:12px 16px;margin-bottom:14px;border-left:4px solid #22c55e;display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">✅</span>
+      <div><div style="font-weight:800;color:#22c55e">Registrado com sucesso!</div>
+      <div style="font-size:13px;color:var(--muted)">🎨 ${esc(lastAdded.theme)} · ${lastAdded.qty} convite(s) · 📅 ${fmtDate(lastAdded.date)}</div></div>
+    </div>`:''}
     <div class="card" style="margin-bottom:14px">
       <h3 style="font-weight:800;margin-bottom:12px">📅 Produzidos Hoje</h3>
       ${todayItems.length===0?'<p style="color:var(--muted);font-size:13px">Nenhum registro hoje ainda.</p>':todayItems.map(p=>`
@@ -652,13 +659,19 @@ function toggleTheme(key){expandedThemes[key]=!expandedThemes[key];renderConvite
 function addConvite(){
   const theme=document.getElementById('cTheme').value.trim();
   const qty=parseInt(document.getElementById('cQty').value)||1;
+  const dateVal=document.getElementById('cDate').value;
   if(!theme)return;
-  const today=new Date().toDateString();
-  const ex=S.convitesDodia.find(p=>p.theme.toLowerCase()===theme.toLowerCase()&&new Date(p.date).toDateString()===today);
+  const dateISO=dateVal?new Date(dateVal).toISOString():nowISO();
+  const dateKey=new Date(dateISO).toDateString();
+  const ex=S.convitesDodia.find(p=>p.theme.toLowerCase()===theme.toLowerCase()&&new Date(p.date).toDateString()===dateKey);
   if(ex){S.convitesDodia=S.convitesDodia.map(p=>p.id===ex.id?{...p,qty:Number(p.qty)+qty}:p);}
-  else{S.convitesDodia.push({id:uid(),theme,qty,date:nowISO()});}
-  document.getElementById('cTheme').value='';document.getElementById('cQty').value='1';
-  renderConvites();renderDashboard();
+  else{S.convitesDodia.push({id:uid(),theme,qty,date:dateISO});}
+  // show last added
+  const lastAdded={theme,qty,date:dateISO};
+  document.getElementById('cTheme').value='';
+  document.getElementById('cQty').value='1';
+  document.getElementById('cDate').value=new Date().toISOString().slice(0,10);
+  renderConvites(lastAdded);renderDashboard();
 }
 function adjustConvite(id,delta){S.convitesDodia=S.convitesDodia.map(p=>{if(p.id!==id)return p;const n=Number(p.qty)+delta;return n<=0?null:{...p,qty:n};}).filter(Boolean);renderConvites();renderDashboard();}
 function deleteConvite(id){S.convitesDodia=S.convitesDodia.filter(x=>x.id!==id);renderConvites();renderDashboard();}
@@ -666,7 +679,7 @@ function deleteConvite(id){S.convitesDodia=S.convitesDodia.filter(x=>x.id!==id);
 // ═══ ORÇAMENTOS ═══
 let expandedOrcDays={};
 
-function renderOrcamentos(){
+function renderOrcamentos(lastAddedId){
   // Group orçamentos by date added
   const dayMap={};
   [...S.orcamentos].forEach(o=>{
@@ -734,15 +747,22 @@ function renderOrcamentos(){
       </div>
       <button class="btn btn-primary" onclick="addOrc()">+ Registrar</button>
     </div>
+    ${lastAddedId?`<div style="background:#22c55e18;border:1.5px solid #22c55e44;border-radius:12px;padding:12px 16px;margin-bottom:14px;border-left:4px solid #22c55e;display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">✅</span>
+      <div><div style="font-weight:800;color:#22c55e">Orçamento registrado!</div>
+      <div style="font-size:13px;color:var(--muted)">🎨 ${esc((S.orcamentos.find(o=>o.id===lastAddedId)||{}).theme||'')} · ${(S.orcamentos.find(o=>o.id===lastAddedId)||{}).count||1}x</div></div>
+    </div>`:''}
     ${S.orcamentos.length===0?'<p style="color:var(--muted)">Nenhum orçamento ainda.</p>':daysHtml}`;
 }
 function toggleOrcDay(key){expandedOrcDays[key]=!expandedOrcDays[key];renderOrcamentos();}
 function addOrc(){
   const i=document.getElementById('orcInput');const theme=i.value.trim();if(!theme)return;
   const ex=S.orcamentos.find(o=>o.theme.toLowerCase()===theme.toLowerCase());
-  if(ex){S.orcamentos=S.orcamentos.map(o=>o.id===ex.id?{...o,count:o.count+1}:o);}
-  else{S.orcamentos.push({id:uid(),theme,count:1,createdAt:nowISO()});}
-  i.value='';hideAC('orcAcList');renderOrcamentos();renderDashboard();
+  let addedId=null;
+  if(ex){S.orcamentos=S.orcamentos.map(o=>o.id===ex.id?{...o,count:o.count+1}:o);addedId=ex.id;}
+  else{const newO={id:uid(),theme,count:1,createdAt:nowISO()};S.orcamentos.push(newO);addedId=newO.id;}
+  i.value='';hideAC('orcAcList');
+  renderOrcamentos(addedId);renderDashboard();
 }
 function adjustOrc(id,delta){S.orcamentos=S.orcamentos.map(o=>{if(o.id!==id)return o;const n=o.count+delta;return n<=0?null:{...o,count:n};}).filter(Boolean);renderOrcamentos();renderDashboard();}
 function deleteOrc(id){S.orcamentos=S.orcamentos.filter(x=>x.id!==id);renderOrcamentos();renderDashboard();}
