@@ -798,7 +798,7 @@ function renderLibrary(){
   const renderThemeCard=t=>{
     const models=Number(t.models||0),orc=getOrcCount(t.name),prodTotal=getTotalProd(t.name);
     const ins=themeInsight(models,orc,0);
-    return `<div class="theme-card" style="margin-bottom:8px">
+    return `<div class="theme-card" data-name="${t.name.toLowerCase()}" style="margin-bottom:8px">
       <div style="display:flex;gap:7px;align-items:center;margin-bottom:8px">
         <div style="flex:1;font-weight:800;font-size:14px">🎨 ${esc(t.name)}</div>
         <button class="btn btn-ghost btn-sm" onclick="openThemeModal('${t.id}')">✏️</button>
@@ -841,10 +841,28 @@ function renderLibrary(){
       <button class="btn btn-primary" onclick="openThemeModal(null)">+ Novo Tema</button>
     </div>
     <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Temas organizados por nível de estoque. Clique no grupo para expandir.</p>
-    <div class="search-wrap"><input class="search-input" id="libSearch" placeholder="Buscar tema..." value="${esc(q)}" oninput="filterLibrary(this.value)"/></div>
+    <div class="search-wrap"><input class="search-input" id="libSearch" placeholder="Buscar tema..." value="${esc(q)}" oninput="filterLibraryLive(this.value)"/></div>
     ${groupsHtml}`;
 }
 function toggleLibGroup(key){expandedLibGroups[key]=!expandedLibGroups[key];renderLibrary();}
+
+function filterLibraryLive(q){
+  // Just show/hide theme cards without re-rendering anything
+  const lcq=q.toLowerCase().trim();
+  document.querySelectorAll('.theme-card[data-name]').forEach(card=>{
+    const name=card.dataset.name||'';
+    card.style.display=(!lcq||name.includes(lcq))?'':'none';
+  });
+  // Update badges
+  document.querySelectorAll('[id^="lib-badge-"]').forEach(badge=>{
+    const bodyId=badge.id.replace('lib-badge-','lib-body-');
+    const body=document.getElementById(bodyId);
+    if(body){
+      const visible=[...body.querySelectorAll('.theme-card[data-name]')].filter(c=>c.style.display!=='none').length;
+      badge.textContent=visible+' tema(s)';
+    }
+  });
+}
 
 function filterLibrary(q){
   // Re-render only the groups content without losing focus
@@ -874,7 +892,7 @@ function renderThemeCardHtml(t){
   const models=Number(t.models||0),orc=getOrcCount(t.name),prodTotal=getTotalProd(t.name);
   const ins=themeInsight(models,orc,0);
   const needsSuggestion=orc>0&&models<15;
-  return '<div class="theme-card" style="margin-bottom:8px">'+
+  return '<div class="theme-card" data-name="'+t.name.toLowerCase()+'" style="margin-bottom:8px">'+
     '<div style="display:flex;gap:7px;align-items:center;margin-bottom:8px">'+
     '<div style="flex:1;font-weight:800;font-size:14px">🎨 '+esc(t.name)+'</div>'+
     '<button class="btn btn-ghost btn-sm" onclick="openThemeModal(''+t.id+'')">✏️</button>'+
